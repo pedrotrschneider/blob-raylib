@@ -1,5 +1,8 @@
-use crate::types::Color;
-use crate::{bindings, ConfigFlag, CubemapLayout, Font, Gamepad, GamepadAxis, GamepadButton, Image, KeyboardKey, MouseButton, NPatchInfo, PixelFormat, Rectangle, RenderTexture2D, Texture2D, TextureCubemap, TextureFilter, TextureWrap, Vector2};
+use crate::{
+    Color, ConfigFlag, CubemapLayout, Font, Gamepad, GamepadAxis, GamepadButton, Image, KeyboardKey, MouseButton,
+    NPatchInfo, PixelFormat, Rectangle, RenderTexture2D, Texture2D, TextureCubemap, TextureFilter, TextureWrap,
+    Vector2, bindings,
+};
 use std::ffi::{CStr, CString};
 use std::os::raw::c_void;
 use std::slice;
@@ -210,7 +213,7 @@ pub fn draw_text(text: &str, pos_x: i32, pos_y: i32, font_size: i32, color: Colo
 // Shape drawing related wrappers
 
 pub fn draw_circle(center_x: i32, center_y: i32, radius: f32, color: Color) {
-    unsafe {bindings::DrawCircle(center_x, center_y, radius, color) };
+    unsafe { bindings::DrawCircle(center_x, center_y, radius, color) };
 }
 
 pub fn draw_circle_v(center: Vector2, radius: f32, color: Color) {
@@ -222,11 +225,11 @@ pub fn draw_rectangle(pos_x: i32, pos_y: i32, width: i32, height: i32, color: Co
 }
 
 pub fn draw_rectangle_rounded(rect: Rectangle, roundness: f32, segments: i32, color: Color) {
-    unsafe {bindings::DrawRectangleRounded(rect, roundness, segments, color) };
+    unsafe { bindings::DrawRectangleRounded(rect, roundness, segments, color) };
 }
 
 pub fn draw_triangle(v1: Vector2, v2: Vector2, v3: Vector2, color: Color) {
-    unsafe {bindings::DrawTriangle(v1, v2, v3, color) };
+    unsafe { bindings::DrawTriangle(v1, v2, v3, color) };
 }
 
 // Input related wrappers: keyboard
@@ -281,11 +284,7 @@ pub fn is_gamepad_button_up(gamepad: &Gamepad, button: GamepadButton) -> bool {
 pub fn get_gamepad_button_pressed() -> Option<GamepadButton> {
     unsafe {
         let button = bindings::GetGamepadButtonPressed();
-        if button >= 0 {
-            button.try_into().ok()
-        } else {
-            None
-        }
+        if button >= 0 { button.try_into().ok() } else { None }
     }
 }
 
@@ -305,7 +304,6 @@ pub fn set_gamepad_mappings(mappings: &str) -> i32 {
 pub fn set_gamepad_vibration(gamepad: &Gamepad, left_motor: f32, right_motor: f32, duration: f32) {
     unsafe { bindings::SetGamepadVibration(gamepad.id, left_motor, right_motor, duration) }
 }
-
 
 // Input related wrappers: mouse
 
@@ -382,7 +380,14 @@ pub fn load_image_anim(filename: &str, frames: &mut i32) -> Image {
 
 pub fn load_image_anim_from_memory(file_type: &str, file_data: &[u8], frames: &mut i32) -> Image {
     let c_file_type = CString::new(file_type).expect("Failed to create CString");
-    return unsafe { bindings::LoadImageAnimFromMemory(c_file_type.as_ptr(), file_data.as_ptr(), file_data.len() as i32, frames as *mut i32) };
+    return unsafe {
+        bindings::LoadImageAnimFromMemory(
+            c_file_type.as_ptr(),
+            file_data.as_ptr(),
+            file_data.len() as i32,
+            frames as *mut i32,
+        )
+    };
 }
 
 pub fn load_image_from_memory(file_type: &str, file_data: &[u8]) -> Image {
@@ -540,7 +545,14 @@ pub fn image_resize_nn(image: &mut Image, new_width: i32, new_height: i32) {
     unsafe { bindings::ImageResizeNN(image as *mut Image, new_width, new_height) };
 }
 
-pub fn image_resize_canvas(image: &mut Image, new_width: i32, new_height: i32, offset_x: i32, offset_y: i32, fill: Color) {
+pub fn image_resize_canvas(
+    image: &mut Image,
+    new_width: i32,
+    new_height: i32,
+    offset_x: i32,
+    offset_y: i32,
+    fill: Color,
+) {
     unsafe { bindings::ImageResizeCanvas(image as *mut Image, new_width, new_height, offset_x, offset_y, fill) };
 }
 
@@ -607,7 +619,7 @@ pub fn load_image_colors(image: Image) -> &'static mut [Color] {
 pub fn load_image_palette(image: Image, max_palette_size: i32) -> &'static mut [Color] {
     let color_count: *mut i32 = std::ptr::null_mut();
     unsafe {
-        let colors_ptr = bindings::LoadImagePalette(image, max_palette_size, color_count as *mut i32);
+        let colors_ptr = bindings::LoadImagePalette(image, max_palette_size, color_count);
         return slice::from_raw_parts_mut(colors_ptr, *color_count as usize);
     }
 }
@@ -644,7 +656,14 @@ pub fn image_draw_pixel_v(dst: &mut Image, position: Vector2, color: Color) {
     unsafe { bindings::ImageDrawPixelV(dst as *mut Image, position, color) };
 }
 
-pub fn image_draw_line(dst: &mut Image, start_pos_x: i32, start_pos_y: i32, end_pos_x: i32, end_pos_y: i32, color: Color) {
+pub fn image_draw_line(
+    dst: &mut Image,
+    start_pos_x: i32,
+    start_pos_y: i32,
+    end_pos_x: i32,
+    end_pos_y: i32,
+    color: Color,
+) {
     unsafe { bindings::ImageDrawLine(dst as *mut Image, start_pos_x, start_pos_y, end_pos_x, end_pos_y, color) };
 }
 
@@ -717,16 +736,34 @@ pub fn image_draw_text(dst: &mut Image, text: &str, pos_x: i32, pos_y: i32, font
     unsafe { bindings::ImageDrawText(dst as *mut Image, c_text.as_ptr(), pos_x, pos_y, font_size, color) };
 }
 
-pub fn image_draw_text_ex(dst: &mut Image, font: Font, text: &str, position: Vector2, font_size: f32, spacing: f32, tint: Color) {
+pub fn image_draw_text_ex(
+    dst: &mut Image,
+    font: Font,
+    text: &str,
+    position: Vector2,
+    font_size: f32,
+    spacing: f32,
+    tint: Color,
+) {
     let c_text = CString::new(text).expect("Failed to create CString");
-    unsafe { bindings::ImageDrawTextEx(dst as *mut Image, font, c_text.as_ptr(), position, font_size, spacing, tint) };
+    unsafe {
+        bindings::ImageDrawTextEx(
+            dst as *mut Image,
+            font,
+            c_text.as_ptr(),
+            position,
+            font_size,
+            spacing,
+            tint,
+        )
+    };
 }
 
 // ---------------------------------------------------------------------------------
 // Texture loading wrappers
 // ---------------------------------------------------------------------------------
 
-pub fn load_texture(filename: &str) -> Texture2D { 
+pub fn load_texture(filename: &str) -> Texture2D {
     let c_text = CString::new(filename).expect("Failed to create CString");
     return unsafe { bindings::LoadTexture(c_text.as_ptr()) };
 }
@@ -788,7 +825,7 @@ pub fn set_texture_wrap(texture: Texture2D, wrap: TextureWrap) {
 // ---------------------------------------------------------------------------------
 
 pub fn draw_texture(texture: Texture2D, pos_x: i32, pos_y: i32, tint: Color) {
-    unsafe { bindings::DrawTexture(texture, pos_x, pos_y, tint)};
+    unsafe { bindings::DrawTexture(texture, pos_x, pos_y, tint) };
 }
 
 pub fn draw_texture_v(texture: Texture2D, position: Vector2, tint: Color) {
@@ -803,10 +840,24 @@ pub fn draw_texture_rec(texture: Texture2D, source: Rectangle, position: Vector2
     unsafe { bindings::DrawTextureRec(texture, source, position, tint) };
 }
 
-pub fn draw_texture_pro(texture: Texture2D, source: Rectangle, dest: Rectangle, origin: Vector2, rotation: f32, tint: Color) {
+pub fn draw_texture_pro(
+    texture: Texture2D,
+    source: Rectangle,
+    dest: Rectangle,
+    origin: Vector2,
+    rotation: f32,
+    tint: Color,
+) {
     unsafe { bindings::DrawTexturePro(texture, source, dest, origin, rotation, tint) };
 }
 
-pub fn draw_texture_n_patch(texture: Texture2D, n_patch_info: NPatchInfo, dest: Rectangle, origin: Vector2, rotation: f32, tint: Color) {
+pub fn draw_texture_n_patch(
+    texture: Texture2D,
+    n_patch_info: NPatchInfo,
+    dest: Rectangle,
+    origin: Vector2,
+    rotation: f32,
+    tint: Color,
+) {
     unsafe { bindings::DrawTextureNPatch(texture, n_patch_info, dest, origin, rotation, tint) };
 }

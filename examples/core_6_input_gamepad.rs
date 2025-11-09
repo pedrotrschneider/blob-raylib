@@ -1,4 +1,9 @@
-use blob_raylib::{begin_drawing, clear_background, draw_circle, draw_rectangle, draw_rectangle_rounded, draw_text, draw_texture, draw_triangle, end_drawing, get_gamepad_button_pressed, init_window, is_key_pressed, set_config_flags, set_target_fps, window_should_close, ConfigFlags, Gamepad, GamepadAxis, GamepadButton, Image, KeyboardKey, Texture2D, BLACK, BLUE, DARKGRAY, GOLD, GRAY, GREEN, LIGHTGRAY, LIME, MAROON, PINK, RAYWHITE, RED, VIOLET};
+use blob_raylib::{
+    BLACK, BLUE, ConfigFlags, DARKGRAY, GOLD, GRAY, GREEN, Gamepad, GamepadAxis, GamepadButton, Image, KeyboardKey,
+    LIGHTGRAY, LIME, MAROON, PINK, RAYWHITE, RED, Texture2D, VIOLET, begin_drawing, clear_background, draw_circle,
+    draw_rectangle, draw_rectangle_rounded, draw_text, draw_texture, draw_triangle, end_drawing,
+    get_gamepad_button_pressed, init_window, is_key_pressed, set_config_flags, set_target_fps, window_should_close,
+};
 
 const XBOX_ALIAS_1: &str = "xbox";
 const XBOX_ALIAS_2: &str = "x-box";
@@ -56,17 +61,33 @@ fn main() {
             let mut left_trigger = gamepad.get_axis_movement(GamepadAxis::AxisLeftTrigger);
             let mut right_trigger = gamepad.get_axis_movement(GamepadAxis::AxisRightTrigger);
 
-            if left_stick_x > -left_stick_deadzone_x && left_stick_x < left_stick_deadzone_x { left_stick_x = 0f32; }
-            if left_stick_y > -left_stick_deadzone_y && left_stick_y < left_stick_deadzone_y { left_stick_y = 0f32; }
-            if right_stick_x > -right_stick_deadzone_x && right_stick_x < right_stick_deadzone_x { right_stick_x = 0f32; }
-            if right_stick_y > -right_stick_deadzone_y && right_stick_y < right_stick_deadzone_y { right_stick_y = 0f32; }
-            if left_trigger < left_trigger_deadzone { left_trigger = -1f32; }
-            if right_trigger < right_trigger_deadzone { right_trigger = -1f32; }
+            if left_stick_x > -left_stick_deadzone_x && left_stick_x < left_stick_deadzone_x {
+                left_stick_x = 0f32;
+            }
+            if left_stick_y > -left_stick_deadzone_y && left_stick_y < left_stick_deadzone_y {
+                left_stick_y = 0f32;
+            }
+            if right_stick_x > -right_stick_deadzone_x && right_stick_x < right_stick_deadzone_x {
+                right_stick_x = 0f32;
+            }
+            if right_stick_y > -right_stick_deadzone_y && right_stick_y < right_stick_deadzone_y {
+                right_stick_y = 0f32;
+            }
+            if left_trigger < left_trigger_deadzone {
+                left_trigger = -1f32;
+            }
+            if right_trigger < right_trigger_deadzone {
+                right_trigger = -1f32;
+            }
 
-            if gamepad.name().unwrap().to_lowercase().contains(XBOX_ALIAS_1) || gamepad.name().unwrap().to_lowercase().contains(XBOX_ALIAS_2) {
+            if gamepad.name().unwrap().to_lowercase().contains(XBOX_ALIAS_1)
+                || gamepad.name().unwrap().to_lowercase().contains(XBOX_ALIAS_2)
+            {
                 draw_texture(tex_xbox_pad, 0, 0, DARKGRAY);
 
-                if gamepad.is_button_down(GamepadButton::Middle) {draw_circle(394, 89, 19f32, RED)}
+                if gamepad.is_button_down(GamepadButton::Middle) {
+                    draw_circle(394, 89, 19f32, RED)
+                }
 
                 if gamepad.is_button_down(GamepadButton::MiddleRight) {
                     draw_circle(436, 150, 9.0, RED);
@@ -147,8 +168,7 @@ fn main() {
                 draw_rectangle(604, 30, 15, 70, GRAY);
                 draw_rectangle(170, 30, 15, (((1.0 + left_trigger) / 2.0) * 70.0) as i32, RED);
                 draw_rectangle(604, 30, 15, (((1.0 + right_trigger) / 2.0) * 70.0) as i32, RED);
-            }
-            else if gamepad.name().unwrap().to_lowercase().contains(PS_ALIAS) {
+            } else if gamepad.name().unwrap().to_lowercase().contains(PS_ALIAS) {
                 draw_texture(tex_ps_pad, 0, 0, DARKGRAY);
 
                 // Draw buttons: ps
@@ -161,7 +181,12 @@ fn main() {
                     draw_rectangle(328, 170, 32, 13, RED);
                 }
                 if gamepad.is_button_down(GamepadButton::MiddleRight) {
-                    draw_triangle((436f32, 168f32).into(), (436f32, 185f32).into(), (464f32, 177f32).into(), RED);
+                    draw_triangle(
+                        (436f32, 168f32).into(),
+                        (436f32, 185f32).into(),
+                        (464f32, 177f32).into(),
+                        RED,
+                    );
                 }
                 if gamepad.is_button_down(GamepadButton::RightFaceUp) {
                     draw_circle(557, 144, 13.0, LIME);
@@ -235,8 +260,7 @@ fn main() {
                 draw_rectangle(611, 48, 15, 70, GRAY);
                 draw_rectangle(169, 48, 15, (((1.0 + left_trigger) / 2.0) * 70.0) as i32, RED);
                 draw_rectangle(611, 48, 15, (((1.0 + right_trigger) / 2.0) * 70.0) as i32, RED);
-            }
-            else {
+            } else {
                 // Draw background: generic
                 draw_rectangle_rounded((175f32, 110f32, 460f32, 220f32).into(), 0.3, 16, DARKGRAY);
 
@@ -356,28 +380,14 @@ fn main() {
             }
 
             if let Some(button) = get_gamepad_button_pressed() {
-                draw_text(
-                    &format!("DETECTED BUTTON: {:?}", button),
-                    10,
-                    430,
-                    10,
-                    RED,
-                );
+                draw_text(&format!("DETECTED BUTTON: {:?}", button), 10, 430, 10, RED);
             } else {
                 draw_text("DETECTED BUTTON: NONE", 10, 430, 10, GRAY);
             }
-        }
-        else {
-            draw_text(
-                &format!("GP{}: NOT DETECTED", gamepad.id()),
-                10,
-                10,
-                10,
-                GRAY,
-            );
+        } else {
+            draw_text(&format!("GP{}: NOT DETECTED", gamepad.id()), 10, 10, 10, GRAY);
             draw_texture(tex_xbox_pad, 0, 0, LIGHTGRAY);
         }
-
 
         end_drawing();
     }

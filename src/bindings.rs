@@ -1,7 +1,6 @@
 #![allow(non_snake_case)]
 
-use crate::types::Color;
-use crate::{Font, Image, NPatchInfo, Rectangle, RenderTexture2D, Texture2D, TextureCubemap, Vector2};
+use crate::{Color, Font, Image, NPatchInfo, Rectangle, RenderTexture2D, Texture2D, TextureCubemap, Vector2};
 use std::ffi::c_uint;
 use std::os::raw::{c_char, c_float, c_int, c_uchar, c_void};
 
@@ -88,9 +87,20 @@ unsafe extern "C" {
     // Image loading functions
     // ---------------------------------------------------------------------------------
     pub(crate) fn LoadImage(fileName: *const c_char) -> Image;
-    pub(crate) fn LoadImageRaw(fileName: *const c_char, width: c_int, height: c_int, format: c_int, headerSize: c_int) -> Image;
+    pub(crate) fn LoadImageRaw(
+        fileName: *const c_char,
+        width: c_int,
+        height: c_int,
+        format: c_int,
+        headerSize: c_int,
+    ) -> Image;
     pub(crate) fn LoadImageAnim(fileName: *const c_char, frames: *mut c_int) -> Image;
-    pub(crate) fn LoadImageAnimFromMemory(fileType: *const c_char, fileData: *const c_uchar, dataSize: c_int, frames: *mut c_int) -> Image;
+    pub(crate) fn LoadImageAnimFromMemory(
+        fileType: *const c_char,
+        fileData: *const c_uchar,
+        dataSize: c_int,
+        frames: *mut c_int,
+    ) -> Image;
     pub(crate) fn LoadImageFromMemory(fileType: *const c_char, fileData: *const c_uchar, dataSize: c_int) -> Image;
     pub(crate) fn LoadImageFromTexture(texture: Texture2D) -> Image;
     pub(crate) fn LoadImageFromScreen() -> Image;
@@ -104,12 +114,43 @@ unsafe extern "C" {
     // Image generation functions
     // ---------------------------------------------------------------------------------
     pub(crate) fn GenImageColor(width: c_int, height: c_int, color: Color) -> Image;
-    pub(crate) fn GenImageGradientLinear(width: c_int, height: c_int, direction: c_int, start: Color, end: Color) -> Image;
-    pub(crate) fn GenImageGradientRadial(width: c_int, height: c_int, density: c_float, inner: Color, outer: Color) -> Image;
-    pub(crate) fn GenImageGradientSquare(width: c_int, height: c_int, density: c_float, inner: Color, outer: Color) -> Image;
-    pub(crate) fn GenImageChecked(width: c_int, height: c_int, checksX: c_int, checksY: c_int, col1: Color, col2: Color) -> Image;
+    pub(crate) fn GenImageGradientLinear(
+        width: c_int,
+        height: c_int,
+        direction: c_int,
+        start: Color,
+        end: Color,
+    ) -> Image;
+    pub(crate) fn GenImageGradientRadial(
+        width: c_int,
+        height: c_int,
+        density: c_float,
+        inner: Color,
+        outer: Color,
+    ) -> Image;
+    pub(crate) fn GenImageGradientSquare(
+        width: c_int,
+        height: c_int,
+        density: c_float,
+        inner: Color,
+        outer: Color,
+    ) -> Image;
+    pub(crate) fn GenImageChecked(
+        width: c_int,
+        height: c_int,
+        checksX: c_int,
+        checksY: c_int,
+        col1: Color,
+        col2: Color,
+    ) -> Image;
     pub(crate) fn GenImageWhiteNoise(width: c_int, height: c_int, factor: c_float) -> Image;
-    pub(crate) fn GenImagePerlinNoise(width: c_int, height: c_int, offsetX: c_int, offsetY: c_int, scale: c_float) -> Image;
+    pub(crate) fn GenImagePerlinNoise(
+        width: c_int,
+        height: c_int,
+        offsetX: c_int,
+        offsetY: c_int,
+        scale: c_float,
+    ) -> Image;
     pub(crate) fn GenImageCellular(width: c_int, height: c_int, tileSize: c_int) -> Image;
     pub(crate) fn GenImageText(width: c_int, height: c_int, text: *const c_char) -> Image;
 
@@ -120,7 +161,13 @@ unsafe extern "C" {
     pub(crate) fn ImageFromImage(image: Image, rec: Rectangle) -> Image;
     pub(crate) fn ImageFromChannel(image: Image, selectedChannel: c_int) -> Image;
     pub(crate) fn ImageText(text: *const c_char, fontSize: c_int, color: Color) -> Image;
-    pub(crate) fn ImageTextEx(font: Font, text: *const c_char, fontSize: c_float, spacing: c_float, tint: Color) -> Image;
+    pub(crate) fn ImageTextEx(
+        font: Font,
+        text: *const c_char,
+        fontSize: c_float,
+        spacing: c_float,
+        tint: Color,
+    ) -> Image;
     pub(crate) fn ImageFormat(image: *mut Image, newFormat: c_int);
     pub(crate) fn ImageToPOT(image: *mut Image, fill: Color);
     pub(crate) fn ImageCrop(image: *mut Image, crop: Rectangle);
@@ -132,7 +179,14 @@ unsafe extern "C" {
     pub(crate) fn ImageKernelConvolution(image: *mut Image, kernel: *const c_float, kernelSize: c_int);
     pub(crate) fn ImageResize(image: *mut Image, newWidth: c_int, newHeight: c_int);
     pub(crate) fn ImageResizeNN(image: *mut Image, newWidth: c_int, newHeight: c_int);
-    pub(crate) fn ImageResizeCanvas(image: *mut Image, newWidth: c_int, newHeight: c_int, offsetX: c_int, offsetY: c_int, fill: Color);
+    pub(crate) fn ImageResizeCanvas(
+        image: *mut Image,
+        newWidth: c_int,
+        newHeight: c_int,
+        offsetX: c_int,
+        offsetY: c_int,
+        fill: Color,
+    );
     pub(crate) fn ImageMipmaps(image: *mut Image);
     pub(crate) fn ImageDither(image: *mut Image, rBpp: c_int, gBpp: c_int, bBpp: c_int, aBpp: c_int);
     pub(crate) fn ImageFlipVertical(image: *mut Image);
@@ -159,25 +213,62 @@ unsafe extern "C" {
     pub(crate) fn ImageClearBackground(dst: *mut Image, color: Color);
     pub(crate) fn ImageDrawPixel(dst: *mut Image, posX: c_int, posY: c_int, color: Color);
     pub(crate) fn ImageDrawPixelV(dst: *mut Image, position: Vector2, color: Color);
-    pub(crate) fn ImageDrawLine(dst: *mut Image, startPosX: c_int, startPosY: c_int, endPosX: c_int, endPosY: c_int, color: Color);
+    pub(crate) fn ImageDrawLine(
+        dst: *mut Image,
+        startPosX: c_int,
+        startPosY: c_int,
+        endPosX: c_int,
+        endPosY: c_int,
+        color: Color,
+    );
     pub(crate) fn ImageDrawLineV(dst: *mut Image, start: Vector2, end: Vector2, color: Color);
     pub(crate) fn ImageDrawLineEx(dst: *mut Image, start: Vector2, end: Vector2, thick: c_int, color: Color);
     pub(crate) fn ImageDrawCircle(dst: *mut Image, centerX: c_int, centerY: c_int, radius: c_int, color: Color);
     pub(crate) fn ImageDrawCircleV(dst: *mut Image, center: Vector2, radius: c_int, color: Color);
     pub(crate) fn ImageDrawCircleLines(dst: *mut Image, centerX: c_int, centerY: c_int, radius: c_int, color: Color);
     pub(crate) fn ImageDrawCircleLinesV(dst: *mut Image, center: Vector2, radius: c_int, color: Color);
-    pub(crate) fn ImageDrawRectangle(dst: *mut Image, posX: c_int, posY: c_int, width: c_int, height: c_int, color: Color);
+    pub(crate) fn ImageDrawRectangle(
+        dst: *mut Image,
+        posX: c_int,
+        posY: c_int,
+        width: c_int,
+        height: c_int,
+        color: Color,
+    );
     pub(crate) fn ImageDrawRectangleV(dst: *mut Image, position: Vector2, size: Vector2, color: Color);
     pub(crate) fn ImageDrawRectangleRec(dst: *mut Image, rec: Rectangle, color: Color);
     pub(crate) fn ImageDrawRectangleLines(dst: *mut Image, rec: Rectangle, thick: c_int, color: Color);
     pub(crate) fn ImageDrawTriangle(dst: *mut Image, v1: Vector2, v2: Vector2, v3: Vector2, color: Color);
-    pub(crate) fn ImageDrawTriangleEx(dst: *mut Image, v1: Vector2, v2: Vector2, v3: Vector2, c1: Color, c2: Color, c3: Color);
+    pub(crate) fn ImageDrawTriangleEx(
+        dst: *mut Image,
+        v1: Vector2,
+        v2: Vector2,
+        v3: Vector2,
+        c1: Color,
+        c2: Color,
+        c3: Color,
+    );
     pub(crate) fn ImageDrawTriangleLines(dst: *mut Image, v1: Vector2, v2: Vector2, v3: Vector2, color: Color);
     pub(crate) fn ImageDrawTriangleFan(dst: *mut Image, points: *const Vector2, pointCount: c_int, color: Color);
     pub(crate) fn ImageDrawTriangleStrip(dst: *mut Image, points: *const Vector2, pointCount: c_int, color: Color);
     pub(crate) fn ImageDraw(dst: *mut Image, src: Image, srcRec: Rectangle, dstRec: Rectangle, tint: Color);
-    pub(crate) fn ImageDrawText(dst: *mut Image, text: *const c_char, posX: c_int, posY: c_int, fontSize: c_int, color: Color);
-    pub(crate) fn ImageDrawTextEx(dst: *mut Image, font: Font, text: *const c_char, position: Vector2, fontSize: c_float, spacing: c_float, tint: Color);
+    pub(crate) fn ImageDrawText(
+        dst: *mut Image,
+        text: *const c_char,
+        posX: c_int,
+        posY: c_int,
+        fontSize: c_int,
+        color: Color,
+    );
+    pub(crate) fn ImageDrawTextEx(
+        dst: *mut Image,
+        font: Font,
+        text: *const c_char,
+        position: Vector2,
+        fontSize: c_float,
+        spacing: c_float,
+        tint: Color,
+    );
 
     // ---------------------------------------------------------------------------------
     // Texture loading functions
@@ -207,6 +298,20 @@ unsafe extern "C" {
     pub(crate) fn DrawTextureV(texture: Texture2D, position: Vector2, tint: Color);
     pub(crate) fn DrawTextureEx(texture: Texture2D, position: Vector2, rotation: c_float, scale: c_float, tint: Color);
     pub(crate) fn DrawTextureRec(texture: Texture2D, source: Rectangle, position: Vector2, tint: Color);
-    pub(crate) fn DrawTexturePro(texture: Texture2D, source: Rectangle, dest: Rectangle, origin: Vector2, rotation: c_float, tint: Color);
-    pub(crate) fn DrawTextureNPatch(texture: Texture2D, nPatchInfo: NPatchInfo, dest: Rectangle, origin: Vector2, rotation: c_float, tint: Color);
+    pub(crate) fn DrawTexturePro(
+        texture: Texture2D,
+        source: Rectangle,
+        dest: Rectangle,
+        origin: Vector2,
+        rotation: c_float,
+        tint: Color,
+    );
+    pub(crate) fn DrawTextureNPatch(
+        texture: Texture2D,
+        nPatchInfo: NPatchInfo,
+        dest: Rectangle,
+        origin: Vector2,
+        rotation: c_float,
+        tint: Color,
+    );
 }
