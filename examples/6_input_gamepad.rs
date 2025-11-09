@@ -1,4 +1,4 @@
-use blob_raylib::{begin_drawing, clear_background, draw_circle, draw_rectangle, draw_rectangle_rounded, draw_text, draw_texture, draw_triangle, end_drawing, get_gamepad_button_pressed, init_window, is_key_pressed, set_config_flags, set_target_fps, window_should_close, ConfigFlags, Gamepad, GamepadAxis, GamepadButton, KeyboardKey, Texture2D, BLACK, BLUE, DARKGRAY, GOLD, GRAY, GREEN, LIGHTGRAY, LIME, MAROON, PINK, RAYWHITE, RED, VIOLET};
+use blob_raylib::{begin_drawing, clear_background, draw_circle, draw_rectangle, draw_rectangle_rounded, draw_text, draw_texture, draw_triangle, end_drawing, get_gamepad_button_pressed, init_window, is_key_pressed, set_config_flags, set_target_fps, window_should_close, ConfigFlags, Gamepad, GamepadAxis, GamepadButton, Image, KeyboardKey, Texture2D, BLACK, BLUE, DARKGRAY, GOLD, GRAY, GREEN, LIGHTGRAY, LIME, MAROON, PINK, RAYWHITE, RED, VIOLET};
 
 const XBOX_ALIAS_1: &str = "xbox";
 const XBOX_ALIAS_2: &str = "x-box";
@@ -12,8 +12,11 @@ fn main() {
     init_window(screen_width, screen_height, "raylib [core] example - input gamepad");
     set_target_fps(60);
 
-    let tex_ps_pad = Texture2D::load("resources/ps3.png");
-    let tex_xbox_pad = Texture2D::load("resources/xbox.png");
+    let ps_pad_img = Image::load_from_memory(".png", include_bytes!("resources/ps3.png"));
+    let xbox_pad_img = Image::load_from_memory(".png", include_bytes!("resources/xbox.png"));
+
+    let tex_ps_pad = Texture2D::from_image(ps_pad_img);
+    let tex_xbox_pad = Texture2D::from_image(xbox_pad_img);
 
     // Set axis deadzones
     let left_stick_deadzone_x: f32 = 0.1f32;
