@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!--
+      This viewport tag is crucial for correct scaling and behavior
+      on mobile devices.
+    -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>raylib wasm</title>
+
+    <style>
+        /* Basic reset for a fullscreen, black background */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Hide scrollbars */
+            background-color: #000;
+            color: #fff; /* White text for loading/fallback */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        /* Use flexbox on the body to easily center the canvas
+          both horizontally (justify-content) and vertically (align-items).
+        */
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Default canvas styling.
+          The JavaScript will set the final 'width' and 'height' styles.
+        */
+        canvas {
+            border: 0;
+            /* Ensures that if the browser tries to be "smart",
+              it respects the aspect ratio.
+            */
+            object-fit: contain;
+        }
+
+        /* Fallback text styles */
+        .fallback-text {
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<!--
+  The canvas element that Emscripten and raylib will use.
+  The 'width' and 'height' attributes (framebuffer resolution)
+  will be set by the Module.setCanvasSize function below.
+
+  The 'style.width' and 'style.height' (CSS display size)
+  will be set by our resizeGameCanvas() function.
+-->
+<canvas id="canvas" width="320" height="240">
+    <!-- Fallback content for older browsers -->
+    <div class="fallback-text">
+        <h2>Loading Game...</h2>
+        <p>If you see this, your browser might not support WebGL or WebAssembly.</p>
+    </div>
+</canvas>
+
+<script>
+    // --- Emscripten Module Configuration ---
+    // This script MUST execute BEFORE the 'game.js' file is loaded.
+
+    // Find our canvas element in the DOM
+    const canvas = document.getElementById('canvas');
+
+    /**
+     * Resizes the canvas's CSS display style to fit the window
+     * while maintaining the aspect ratio of the framebuffer
+     * (canvas.width / canvas.height).
+     * This creates the "black bars" effect (letterboxing/pillarboxing).
+     */
+    function resizeGameCanvas() {
+        // Get the fixed framebuffer size (e.g., 1920x1080)
+        const gameWidth = canvas.width;
+        const gameHeight = canvas.height;
+
+        // Don't run if raylib hasn't initialized the canvas size yet
+        if (gameWidth === 0 || gameHeight === 0) {
+            console.warn("resizeGameCanvas called, but canvas size is 0. Has raylib InitWindow run?");
+            return;
+        }
+
+        const gameRatio = gameWidth / gameHeight;
+
+        // Get browser window dimensions
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
+        const windowRatio = windowWidth / windowHeight;
+
+        let newCssWidth, newCssHeight;
+
+        if (windowRatio > gameRatio) {
+            // Window is wider than the game (letterbox)
+            // Fit to window height
+            newCssHeight = windowHeight;
+            newCssWidth = newCssHeight * gameRatio;
+        } else {
+            // Window is taller than or equal to the game (pillarbox)
+            // Fit to window width
+            newCssWidth = windowWidth;
+            newCssHeight = newCssWidth / gameRatio;
+        }
+
+        // Set the CSS display size of the canvas
+        canvas.style.width = newCssWidth + 'px';
+        canvas.style.height = newCssHeight + 'px';
+    }
+
+    // Run our resize logic whenever the window is resized
+    window.addEventListener('resize', resizeGameCanvas);
+
+    // Define the Emscripten Module object
+    // The generated 'game.js' will look for this object.
+    window.Module = {
+        // Tell Emscripten to use our specific canvas
+        canvas: canvas,
+
+        /**
+         * This function is a special hook called by raylib's
+         * Emscripten port when InitWindow() is called from your Rust code.
+         * It passes the width and height you requested.
+         */
+        setCanvasSize: function (width, height) {
+            // 1. Set the canvas *framebuffer* resolution
+            // This is what raylib will draw to (e.g., 1920x1080).
+            canvas.width = width;
+            canvas.height = height;
+
+            console.log(`raylib InitWindow requested ${width}x${height} framebuffer.`);
+
+            // 2. Set the initial CSS display size
+            // This fits the canvas to the window with black bars.
+            resizeGameCanvas();
+        },
+
+        // postRun is an array of functions to run after the wasm module
+        // is loaded and your main() function has finished.
+        postRun: [function () {
+            console.log("WASM module loaded and main() has run.");
+            // Run resize again just to be safe.
+            resizeGameCanvas();
+        }],
+
+        // Optional: Log status updates from the module to the console
+        print: (text) => console.log(text),
+        printErr: (text) => console.error(text),
+    };
+
+    // --- End of Module Configuration ---
+</script>
+
+<script>
+    (function() {
+        var exLog = console.log;
+        var found = false;
+
+        console.log = function(msg) {
+            if (found) {
+                // Just pass through if already found
+                exLog.apply(console, arguments);
+                return;
+            }
+
+            exLog.apply(console, arguments);
+
+            if (msg.includes("INFO: PLATFORM: WEB: Initialized successfully")) {
+                found = true;
+                console.log = exLog;
+                resizeGameCanvas();
+                exLog("Found the message");
+            }
+        }
+    })();
+
+    // Load the modularized module and assign the canvas before calling it
+    var ModuleArgs = {
+        canvas: document.getElementById("canvas"),
+        onRuntimeInitialized: function () {
+            console.log("raylib WASM is ready");
+        }
+    };
+
+    // Load the module after page load
+    window.addEventListener('load', () => {
+        var script = document.createElement('script');
+        script.src = "raylib_no_crates.js";
+        script.onload = () => {
+            // The global name might be `Module`, `createModule`, or something else.
+            // Try to figure it out based on the contents of raylib_no_crates.js
+            if (typeof createModule !== 'undefined') {
+                createModule(ModuleArgs);
+            } else if (typeof Module !== 'undefined' && typeof Module === 'function') {
+                Module(ModuleArgs);
+            } else {
+                console.error("Could not find modularized Emscripten module function.");
+            }
+        };
+        document.body.appendChild(script);
+    });
+</script>
+
+</body>
+</html>
