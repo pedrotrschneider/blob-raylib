@@ -120,3 +120,34 @@ pub enum KeyboardKey {
     VolumeUp = 24,   // Key: Android volume up button
     VolumeDown = 25, // Key: Android volume down button
 }
+
+impl TryFrom<i32> for KeyboardKey {
+    type Error = ();
+
+    fn try_from(value: i32) -> Result<Self, Self::Error> {
+        if value >= KeyboardKey::Back as i32 && value <= KeyboardKey::VolumeDown as i32 {
+            // This range is tricky, handle manually
+            return match value {
+                4 => Ok(KeyboardKey::Back),
+                5 => Ok(KeyboardKey::Menu),
+                24 => Ok(KeyboardKey::VolumeUp),
+                25 => Ok(KeyboardKey::VolumeDown),
+                _ => Err(()),
+            };
+        }
+
+        if (value >= KeyboardKey::Apostrophe as i32 && value <= KeyboardKey::Grave as i32)
+            || (value >= KeyboardKey::Space as i32 && value <= KeyboardKey::End as i32)
+            || (value >= KeyboardKey::CapsLock as i32 && value <= KeyboardKey::Pause as i32)
+            || (value >= KeyboardKey::F1 as i32 && value <= KeyboardKey::F12 as i32)
+            || (value >= KeyboardKey::LeftShift as i32 && value <= KeyboardKey::KbMenu as i32)
+            || (value >= KeyboardKey::Kp0 as i32 && value <= KeyboardKey::KpEqual as i32)
+            || value == KeyboardKey::Null as i32
+        {
+            // SAFETY: The value is within the valid ranges of the enum.
+            Ok(unsafe { std::mem::transmute(value) })
+        } else {
+            Err(())
+        }
+    }
+}

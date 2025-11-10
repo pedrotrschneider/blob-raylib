@@ -1,10 +1,10 @@
 use crate::{
-    Color, ConfigFlag, CubemapLayout, Font, Gamepad, GamepadAxis, GamepadButton, Image, KeyboardKey, MouseButton,
-    NPatchInfo, PixelFormat, Rectangle, RenderTexture2D, Texture2D, TextureCubemap, TextureFilter, TextureWrap,
-    Vector2, bindings,
+    Color, ConfigFlag, CubemapLayout, Font, Gamepad, GamepadAxis, GamepadButton, GestureFlag, Image, KeyboardKey,
+    MouseButton, MouseCursor, NPatchInfo, PixelFormat, Rectangle, RenderTexture2D, Texture2D, TextureCubemap,
+    TextureFilter, TextureWrap, Vector2, bindings,
 };
 use std::ffi::{CStr, CString};
-use std::os::raw::c_void;
+use std::os::raw::{c_float, c_int, c_void};
 use std::slice;
 
 pub const LIGHTGRAY: Color = Color {
@@ -232,21 +232,65 @@ pub fn draw_triangle(v1: Vector2, v2: Vector2, v3: Vector2, color: Color) {
     unsafe { bindings::DrawTriangle(v1, v2, v3, color) };
 }
 
-// Input related wrappers: keyboard
+// ---------------------------------------------------------------------------------
+// Input-related functions: keyboard
+// ---------------------------------------------------------------------------------
 
+/// Check if a key has been pressed once
 pub fn is_key_pressed(key: KeyboardKey) -> bool {
-    return unsafe { bindings::IsKeyPressed(key as i32) };
+    unsafe { bindings::IsKeyPressed(key as c_int) }
 }
 
+/// Check if a key has been pressed again (useful for continuous key presses)
 pub fn is_key_pressed_repeat(key: KeyboardKey) -> bool {
-    return unsafe { bindings::IsKeyPressedRepeat(key as i32) };
+    unsafe { bindings::IsKeyPressedRepeat(key as c_int) }
 }
 
+/// Check if a key is being pressed
 pub fn is_key_down(key: KeyboardKey) -> bool {
-    return unsafe { bindings::IsKeyDown(key as i32) };
+    unsafe { bindings::IsKeyDown(key as c_int) }
 }
 
-// Input related wrappers: gamepad
+/// Check if a key has been released once
+pub fn is_key_released(key: KeyboardKey) -> bool {
+    unsafe { bindings::IsKeyReleased(key as c_int) }
+}
+
+/// Check if a key is NOT being pressed
+pub fn is_key_up(key: KeyboardKey) -> bool {
+    unsafe { bindings::IsKeyUp(key as c_int) }
+}
+
+/// Get key pressed (keycode), call it multiple times for keys queued
+/// Returns `None` when the queue is empty
+pub fn get_key_pressed() -> Option<KeyboardKey> {
+    unsafe { KeyboardKey::try_from(bindings::GetKeyPressed()).ok() }
+}
+
+/// Get char pressed (unicode), call it multiple times for chars queued
+/// Returns `None` when the queue is empty
+pub fn get_char_pressed() -> Option<char> {
+    unsafe { std::char::from_u32(bindings::GetCharPressed() as u32) }
+}
+
+/// Get name of a QWERTY key on the current keyboard layout
+pub fn get_key_name(key: KeyboardKey) -> &'static str {
+    unsafe {
+        let c_str = bindings::GetKeyName(key as c_int);
+        CStr::from_ptr(c_str).to_str().unwrap_or("")
+    }
+}
+
+/// Set a custom key to exit program (default is ESC)
+/// Pass `None` to restore the default (ESC).
+pub fn set_exit_key(key: Option<KeyboardKey>) {
+    let key_to_set = key.unwrap_or(KeyboardKey::Escape);
+    unsafe { bindings::SetExitKey(key_to_set as c_int) }
+}
+
+// ---------------------------------------------------------------------------------
+// Input-related functions: gamepad
+// ---------------------------------------------------------------------------------
 
 pub fn is_gamepad_available(gamepad: &Gamepad) -> bool {
     return unsafe { bindings::IsGamepadAvailable(gamepad.id) };
@@ -305,38 +349,151 @@ pub fn set_gamepad_vibration(gamepad: &Gamepad, left_motor: f32, right_motor: f3
     unsafe { bindings::SetGamepadVibration(gamepad.id, left_motor, right_motor, duration) }
 }
 
-// Input related wrappers: mouse
+// ---------------------------------------------------------------------------------
+// Input-related functions: mouse
+// ---------------------------------------------------------------------------------
 
+/// Check if a mouse button has been pressed once
 pub fn is_mouse_button_pressed(button: MouseButton) -> bool {
-    return unsafe { bindings::IsMouseButtonPressed(button as i32) };
+    unsafe { bindings::IsMouseButtonPressed(button as c_int) }
 }
 
+/// Check if a mouse button is being pressed
 pub fn is_mouse_button_down(button: MouseButton) -> bool {
-    return unsafe { bindings::IsMouseButtonDown(button as i32) };
+    unsafe { bindings::IsMouseButtonDown(button as c_int) }
 }
 
+/// Check if a mouse button has been released once
 pub fn is_mouse_button_released(button: MouseButton) -> bool {
-    return unsafe { bindings::IsMouseButtonReleased(button as i32) };
+    unsafe { bindings::IsMouseButtonReleased(button as c_int) }
 }
 
+/// Check if a mouse button is NOT being pressed
 pub fn is_mouse_button_up(button: MouseButton) -> bool {
-    return unsafe { bindings::IsMouseButtonUp(button as i32) };
+    unsafe { bindings::IsMouseButtonUp(button as c_int) }
 }
 
+/// Get mouse position X
 pub fn get_mouse_x() -> i32 {
-    return unsafe { bindings::GetMouseX() };
+    unsafe { bindings::GetMouseX() }
 }
 
+/// Get mouse position Y
 pub fn get_mouse_y() -> i32 {
-    return unsafe { bindings::GetMouseY() };
+    unsafe { bindings::GetMouseY() }
 }
 
+/// Get mouse position XY
 pub fn get_mouse_position() -> Vector2 {
-    return unsafe { bindings::GetMousePosition() };
+    unsafe { bindings::GetMousePosition() }
 }
 
+/// Get mouse delta between frames
+pub fn get_mouse_delta() -> Vector2 {
+    unsafe { bindings::GetMouseDelta() }
+}
+
+/// Set mouse position XY
+pub fn set_mouse_position(x: i32, y: i32) {
+    unsafe { bindings::SetMousePosition(x as c_int, y as c_int) }
+}
+
+/// Set mouse offset
+pub fn set_mouse_offset(x: i32, y: i32) {
+    unsafe { bindings::SetMouseOffset(x as c_int, y as c_int) }
+}
+
+/// Set mouse scaling
+pub fn set_mouse_scale(x: f32, y: f32) {
+    unsafe { bindings::SetMouseScale(x as c_float, y as c_float) }
+}
+
+/// Get mouse wheel movement for X or Y, whichever is larger
 pub fn get_mouse_wheel_move() -> f32 {
-    return unsafe { bindings::GetMouseWheelMove() };
+    unsafe { bindings::GetMouseWheelMove() }
+}
+
+/// Get mouse wheel movement for both X and Y
+pub fn get_mouse_wheel_move_v() -> Vector2 {
+    unsafe { bindings::GetMouseWheelMoveV() }
+}
+
+/// Set mouse cursor
+pub fn set_mouse_cursor(cursor: MouseCursor) {
+    unsafe { bindings::SetMouseCursor(cursor as c_int) }
+}
+
+// ---------------------------------------------------------------------------------
+// Input-related functions: touch
+// ---------------------------------------------------------------------------------
+
+/// Get touch position X for touch point 0
+pub fn get_touch_x() -> i32 {
+    unsafe { bindings::GetTouchX() }
+}
+
+/// Get touch position Y for touch point 0
+pub fn get_touch_y() -> i32 {
+    unsafe { bindings::GetTouchY() }
+}
+
+/// Get touch position XY for a touch point index
+pub fn get_touch_position(index: i32) -> Vector2 {
+    unsafe { bindings::GetTouchPosition(index as c_int) }
+}
+
+/// Get touch point identifier for given index
+pub fn get_touch_point_id(index: i32) -> i32 {
+    unsafe { bindings::GetTouchPointId(index as c_int) }
+}
+
+/// Get number of touch points
+pub fn get_touch_point_count() -> i32 {
+    unsafe { bindings::GetTouchPointCount() }
+}
+
+// ---------------------------------------------------------------------------------
+// Gestures and Touch Handling Functions
+// ---------------------------------------------------------------------------------
+
+/// Enable a set of gestures using flags
+pub fn set_gestures_enabled(flags: GestureFlag) {
+    unsafe { bindings::SetGesturesEnabled(flags.bits()) }
+}
+
+/// Check if a gesture have been detected
+pub fn is_gesture_detected(gesture: GestureFlag) -> bool {
+    unsafe { bindings::IsGestureDetected(gesture.bits()) }
+}
+
+/// Get latest detected gesture
+pub fn get_gesture_detected() -> Option<GestureFlag> {
+    unsafe { GestureFlag::try_from(bindings::GetGestureDetected()).ok() }
+}
+
+/// Get gesture hold time in seconds
+pub fn get_gesture_hold_duration() -> f32 {
+    unsafe { bindings::GetGestureHoldDuration() }
+}
+
+/// Get gesture drag vector
+pub fn get_gesture_drag_vector() -> Vector2 {
+    unsafe { bindings::GetGestureDragVector() }
+}
+
+/// Get gesture drag angle
+pub fn get_gesture_drag_angle() -> f32 {
+    unsafe { bindings::GetGestureDragAngle() }
+}
+
+/// Get gesture pinch delta
+pub fn get_gesture_pinch_vector() -> Vector2 {
+    unsafe { bindings::GetGesturePinchVector() }
+}
+
+/// Get gesture pinch angle
+pub fn get_gesture_pinch_angle() -> f32 {
+    unsafe { bindings::GetGesturePinchAngle() }
 }
 
 // Cursor related wrappers

@@ -55,6 +55,10 @@ impl Vector2 {
     pub fn new(x: f32, y: f32) -> Self {
         return Self { x, y };
     }
+
+    pub fn zero() -> Self {
+        return Self { x: 0.0, y: 0.0 };
+    }
 }
 
 impl From<(f32, f32)> for Vector2 {

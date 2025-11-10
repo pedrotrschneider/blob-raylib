@@ -5,27 +5,30 @@ use std::ffi::c_uint;
 use std::os::raw::{c_char, c_float, c_int, c_uchar, c_void};
 
 unsafe extern "C" {
-    // ---------------------------------------------------------------------------------
-    // Window and Graphics Device Management
-    // ---------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------
+    // Window and Graphics Device Functions (Module: core)
+    //------------------------------------------------------------------------------------
+
+    // Window-related functions
     pub(crate) fn InitWindow(width: c_int, height: c_int, title: *const c_char);
     pub(crate) fn WindowShouldClose() -> bool;
     pub(crate) fn CloseWindow();
 
-    // ---------------------------------------------------------------------------------
+    // Cursor related functions
+    pub(crate) fn ShowCursor();
+    pub(crate) fn HideCursor();
+    pub(crate) fn IsCursorHidden() -> bool;
+
+    // Drawing-related functions
+    pub(crate) fn ClearBackground(color: Color);
+    pub(crate) fn BeginDrawing();
+    pub(crate) fn EndDrawing();
+    pub(crate) fn DrawText(text: *const c_char, posX: c_int, posY: c_int, fontSize: c_int, color: Color);
+
     // Timing related functions
-    // ---------------------------------------------------------------------------------
     pub(crate) fn SetTargetFPS(fps: c_int);
     pub(crate) fn GetFPS() -> c_int;
     pub(crate) fn GetFrameTime() -> c_float;
-
-    // ---------------------------------------------------------------------------------
-    // Drawing-related functions
-    // ---------------------------------------------------------------------------------
-    pub(crate) fn BeginDrawing();
-    pub(crate) fn EndDrawing();
-    pub(crate) fn ClearBackground(color: Color);
-    pub(crate) fn DrawText(text: *const c_char, posX: c_int, posY: c_int, fontSize: c_int, color: Color);
 
     // ---------------------------------------------------------------------------------
     // Basic Shapes drawing functions
@@ -36,16 +39,22 @@ unsafe extern "C" {
     pub(crate) fn DrawRectangleRounded(rect: Rectangle, roundness: c_float, segments: c_int, color: Color);
     pub(crate) fn DrawTriangle(v1: Vector2, v2: Vector2, v3: Vector2, color: Color);
 
-    // ---------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------
+    // Input Handling Functions (Module: core)
+    //------------------------------------------------------------------------------------
+
     // Input-related functions: keyboard
-    // ---------------------------------------------------------------------------------
     pub(crate) fn IsKeyPressed(key: c_int) -> bool;
     pub(crate) fn IsKeyPressedRepeat(key: c_int) -> bool;
     pub(crate) fn IsKeyDown(key: c_int) -> bool;
+    pub(crate) fn IsKeyReleased(key: c_int) -> bool;
+    pub(crate) fn IsKeyUp(key: c_int) -> bool;
+    pub(crate) fn GetKeyPressed() -> c_int;
+    pub(crate) fn GetCharPressed() -> c_int;
+    pub(crate) fn GetKeyName(key: c_int) -> *const c_char;
+    pub(crate) fn SetExitKey(key: c_int);
 
-    // ---------------------------------------------------------------------------------
     // Input-related functions: gamepads
-    // ---------------------------------------------------------------------------------
     pub(crate) fn IsGamepadAvailable(gamepad: c_int) -> bool;
     pub(crate) fn GetGamepadName(gamepad: c_int) -> *const c_char;
     pub(crate) fn IsGamepadButtonPressed(gamepad: c_int, button: c_int) -> bool;
@@ -58,9 +67,7 @@ unsafe extern "C" {
     pub(crate) fn SetGamepadMappings(mappings: *const c_char) -> c_int;
     pub(crate) fn SetGamepadVibration(gamepad: c_int, left_motor: c_float, right_motor: c_float, duration: c_float);
 
-    // ---------------------------------------------------------------------------------
     // Input-related functions: mouse
-    // ---------------------------------------------------------------------------------
     pub(crate) fn IsMouseButtonPressed(key: c_int) -> bool;
     pub(crate) fn IsMouseButtonDown(key: c_int) -> bool;
     pub(crate) fn IsMouseButtonReleased(key: c_int) -> bool;
@@ -69,13 +76,33 @@ unsafe extern "C" {
     pub(crate) fn GetMouseY() -> c_int;
     pub(crate) fn GetMousePosition() -> Vector2;
     pub(crate) fn GetMouseWheelMove() -> c_float;
+    pub(crate) fn GetMouseDelta() -> Vector2;
+    pub(crate) fn SetMousePosition(x: c_int, y: c_int);
+    pub(crate) fn SetMouseOffset(offsetX: c_int, offsetY: c_int);
+    pub(crate) fn SetMouseScale(scaleX: c_float, scaleY: c_float);
+    pub(crate) fn GetMouseWheelMoveV() -> Vector2;
+    pub(crate) fn SetMouseCursor(cursor: c_int);
 
-    // ---------------------------------------------------------------------------------
-    // Cursor related functions
-    // ---------------------------------------------------------------------------------
-    pub(crate) fn ShowCursor();
-    pub(crate) fn HideCursor();
-    pub(crate) fn IsCursorHidden() -> bool;
+    // Input-related functions: touch
+    pub(crate) fn GetTouchX() -> c_int;
+    pub(crate) fn GetTouchY() -> c_int;
+    pub(crate) fn GetTouchPosition(index: c_int) -> Vector2;
+    pub(crate) fn GetTouchPointId(index: c_int) -> c_int;
+    pub(crate) fn GetTouchPointCount() -> c_int;
+
+    //------------------------------------------------------------------------------------
+    // Gestures and Touch Handling Functions (Module: rgestures)
+    //------------------------------------------------------------------------------------
+
+    // Gestures and Touch Handling Functions
+    pub(crate) fn SetGesturesEnabled(flags: c_uint);
+    pub(crate) fn IsGestureDetected(gesture: c_uint) -> bool;
+    pub(crate) fn GetGestureDetected() -> c_int;
+    pub(crate) fn GetGestureHoldDuration() -> c_float;
+    pub(crate) fn GetGestureDragVector() -> Vector2;
+    pub(crate) fn GetGestureDragAngle() -> c_float;
+    pub(crate) fn GetGesturePinchVector() -> Vector2;
+    pub(crate) fn GetGesturePinchAngle() -> c_float;
 
     // ---------------------------------------------------------------------------------
     // Misc. functions
@@ -83,9 +110,11 @@ unsafe extern "C" {
     pub(crate) fn SetConfigFlags(flags: c_uint);
     pub(crate) fn MemFree(ptr: *mut c_void);
 
-    // ---------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------
+    // Texture Loading and Drawing Functions (Module: textures)
+    //------------------------------------------------------------------------------------
+
     // Image loading functions
-    // ---------------------------------------------------------------------------------
     pub(crate) fn LoadImage(fileName: *const c_char) -> Image;
     pub(crate) fn LoadImageRaw(
         fileName: *const c_char,
@@ -110,9 +139,7 @@ unsafe extern "C" {
     pub(crate) fn ExportImageToMemory(image: Image, fileType: *const c_char, fileSize: *mut c_int) -> *mut c_uchar;
     pub(crate) fn ExportImageAsCode(image: Image, fileName: *const c_char) -> bool;
 
-    // ---------------------------------------------------------------------------------
     // Image generation functions
-    // ---------------------------------------------------------------------------------
     pub(crate) fn GenImageColor(width: c_int, height: c_int, color: Color) -> Image;
     pub(crate) fn GenImageGradientLinear(
         width: c_int,
@@ -154,9 +181,7 @@ unsafe extern "C" {
     pub(crate) fn GenImageCellular(width: c_int, height: c_int, tileSize: c_int) -> Image;
     pub(crate) fn GenImageText(width: c_int, height: c_int, text: *const c_char) -> Image;
 
-    // ---------------------------------------------------------------------------------
     // Image manipulation functions
-    // ---------------------------------------------------------------------------------
     pub(crate) fn ImageCopy(image: Image) -> Image;
     pub(crate) fn ImageFromImage(image: Image, rec: Rectangle) -> Image;
     pub(crate) fn ImageFromChannel(image: Image, selectedChannel: c_int) -> Image;
@@ -207,9 +232,7 @@ unsafe extern "C" {
     pub(crate) fn GetImageAlphaBorder(image: Image, threshold: c_float) -> Rectangle;
     pub(crate) fn GetImageColor(image: Image, x: c_int, y: c_int) -> Color;
 
-    // ---------------------------------------------------------------------------------
     // Image drawing functions
-    // ---------------------------------------------------------------------------------
     pub(crate) fn ImageClearBackground(dst: *mut Image, color: Color);
     pub(crate) fn ImageDrawPixel(dst: *mut Image, posX: c_int, posY: c_int, color: Color);
     pub(crate) fn ImageDrawPixelV(dst: *mut Image, position: Vector2, color: Color);
@@ -270,9 +293,7 @@ unsafe extern "C" {
         tint: Color,
     );
 
-    // ---------------------------------------------------------------------------------
     // Texture loading functions
-    // ---------------------------------------------------------------------------------
     pub(crate) fn LoadTexture(filename: *const i8) -> Texture2D;
     pub(crate) fn LoadTextureFromImage(image: Image) -> Texture2D;
     pub(crate) fn LoadTextureCubemap(image: Image, layout: c_int) -> TextureCubemap;
@@ -284,16 +305,12 @@ unsafe extern "C" {
     pub(crate) fn UpdateTexture(texture: Texture2D, pixels: *const c_void);
     pub(crate) fn UpdateTextureRec(texture: Texture2D, rec: Rectangle, pixels: *const c_void);
 
-    // ---------------------------------------------------------------------------------
     // Texture configuration functions
-    // ---------------------------------------------------------------------------------
     pub(crate) fn GenTextureMipmaps(texture: *mut Texture2D);
     pub(crate) fn SetTextureFilter(texture: Texture2D, filter: c_int);
     pub(crate) fn SetTextureWrap(texture: Texture2D, wrap: c_int);
 
-    // ---------------------------------------------------------------------------------
     // Texture drawing functions
-    // ---------------------------------------------------------------------------------
     pub(crate) fn DrawTexture(texture: Texture2D, posX: c_int, posY: c_int, tint: Color);
     pub(crate) fn DrawTextureV(texture: Texture2D, position: Vector2, tint: Color);
     pub(crate) fn DrawTextureEx(texture: Texture2D, position: Vector2, rotation: c_float, scale: c_float, tint: Color);

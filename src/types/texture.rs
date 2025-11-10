@@ -1,4 +1,9 @@
-use crate::{Color, Image, PixelFormat, Rectangle, Vector2, draw_texture, draw_texture_ex, draw_texture_n_patch, draw_texture_pro, draw_texture_rec, draw_texture_v, gen_texture_mipmaps, is_texture_valid, load_texture, load_texture_cubemap, load_texture_from_image, set_texture_filter, set_texture_wrap, unload_texture, update_texture, update_texture_rec, load_render_texture, is_render_texture_valid, unload_render_texture};
+use crate::{
+    Color, Image, PixelFormat, Rectangle, Vector2, draw_texture, draw_texture_ex, draw_texture_n_patch,
+    draw_texture_pro, draw_texture_rec, draw_texture_v, gen_texture_mipmaps, is_render_texture_valid, is_texture_valid,
+    load_render_texture, load_texture, load_texture_cubemap, load_texture_from_image, set_texture_filter,
+    set_texture_wrap, unload_render_texture, unload_texture, update_texture, update_texture_rec,
+};
 
 #[repr(i32)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
