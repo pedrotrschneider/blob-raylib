@@ -1,8 +1,7 @@
 use blob_raylib::{
-    BEIGE, DARKBLUE, DARKGRAY, KeyboardKey, LIME, MAROON, MouseButton, ORANGE, PURPLE, RAYWHITE, RED, YELLOW,
-    begin_drawing, clear_background, draw_circle_v, draw_text, end_drawing, get_mouse_position, hide_cursor,
-    init_window, is_cursor_hidden, is_key_pressed, is_mouse_button_pressed, set_target_fps, show_cursor,
-    window_should_close,
+    Color, KeyboardKey, MouseButton, begin_drawing, clear_background, draw_circle_v, draw_text, end_drawing,
+    get_mouse_position, hide_cursor, init_window, is_cursor_hidden, is_key_pressed, is_mouse_button_pressed,
+    set_target_fps, show_cursor, window_should_close,
 };
 
 fn main() {
@@ -13,7 +12,7 @@ fn main() {
     set_target_fps(60);
 
     let mut ball_position;
-    let mut ball_color = DARKBLUE;
+    let mut ball_color = Color::DARKBLUE;
 
     while !window_should_close() {
         if is_key_pressed(KeyboardKey::H) {
@@ -27,23 +26,23 @@ fn main() {
         ball_position = get_mouse_position();
 
         if is_mouse_button_pressed(MouseButton::Left) {
-            ball_color = MAROON
+            ball_color = Color::MAROON
         } else if is_mouse_button_pressed(MouseButton::Middle) {
-            ball_color = LIME
+            ball_color = Color::LIME
         } else if is_mouse_button_pressed(MouseButton::Right) {
-            ball_color = DARKBLUE
+            ball_color = Color::DARKBLUE
         } else if is_mouse_button_pressed(MouseButton::Side) {
-            ball_color = PURPLE
+            ball_color = Color::PURPLE
         } else if is_mouse_button_pressed(MouseButton::Extra) {
-            ball_color = YELLOW
+            ball_color = Color::YELLOW
         } else if is_mouse_button_pressed(MouseButton::Forward) {
-            ball_color = ORANGE
+            ball_color = Color::ORANGE
         } else if is_mouse_button_pressed(MouseButton::Back) {
-            ball_color = BEIGE
+            ball_color = Color::BEIGE
         }
 
         begin_drawing();
-        clear_background(RAYWHITE);
+        clear_background(Color::RAYWHITE);
 
         draw_circle_v(ball_position, 40f32, ball_color);
 
@@ -52,14 +51,14 @@ fn main() {
             10,
             10,
             20,
-            DARKGRAY,
+            Color::DARKGRAY,
         );
-        draw_text("Press 'H' to toggle cursor visibility", 10, 30, 20, DARKGRAY);
+        draw_text("Press 'H' to toggle cursor visibility", 10, 30, 20, Color::DARKGRAY);
 
         if is_cursor_hidden() {
-            draw_text("CURSOR HIDDEN", 20, 60, 20, RED);
+            draw_text("CURSOR HIDDEN", 20, 60, 20, Color::RED);
         } else {
-            draw_text("CURSOR VISIBLE", 20, 60, 20, LIME);
+            draw_text("CURSOR VISIBLE", 20, 60, 20, Color::LIME);
         }
 
         end_drawing();

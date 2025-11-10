@@ -1,6 +1,6 @@
 use blob_raylib::{
-    DARKGRAY, KeyboardKey, MAROON, RAYWHITE, Vector2, begin_drawing, clear_background, draw_circle_v, draw_text,
-    end_drawing, init_window, is_key_down, set_target_fps, window_should_close,
+    Color, KeyboardKey, Vector2, begin_drawing, clear_background, draw_circle_v, draw_text, end_drawing, init_window,
+    is_key_down, set_target_fps, window_should_close,
 };
 
 fn main() {
@@ -30,10 +30,10 @@ fn main() {
         }
 
         begin_drawing();
-        clear_background(RAYWHITE);
+        clear_background(Color::RAYWHITE);
 
-        draw_text("move the ball with arrow keys", 10, 10, 20, DARKGRAY);
-        draw_circle_v(ball_position, 50f32, MAROON);
+        draw_text("move the ball with arrow keys", 10, 10, 20, Color::DARKGRAY);
+        draw_circle_v(ball_position, 50f32, Color::MAROON);
 
         end_drawing();
     }

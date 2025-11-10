@@ -1,6 +1,5 @@
 use blob_raylib::{
-    LIGHTGRAY, RAYWHITE, begin_drawing, clear_background, draw_text, end_drawing, init_window, set_target_fps,
-    window_should_close,
+    Color, begin_drawing, clear_background, draw_text, end_drawing, init_window, set_target_fps, window_should_close,
 };
 
 fn main() {
@@ -12,8 +11,14 @@ fn main() {
 
     while !window_should_close() {
         begin_drawing();
-        clear_background(RAYWHITE);
-        draw_text("Congrats! You created your first window!", 190, 200, 20, LIGHTGRAY);
+        clear_background(Color::RAYWHITE);
+        draw_text(
+            "Congrats! You created your first window!",
+            190,
+            200,
+            20,
+            Color::LIGHTGRAY,
+        );
         end_drawing();
     }
 }

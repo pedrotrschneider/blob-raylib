@@ -1,6 +1,6 @@
 use blob_raylib::{
-    BLACK, DARKGRAY, ORANGE, RAYWHITE, Vector2, begin_drawing, clear_background, draw_circle_v, draw_text, end_drawing,
-    get_touch_point_count, get_touch_position, init_window, set_target_fps, window_should_close,
+    Color, Vector2, begin_drawing, clear_background, draw_circle_v, draw_text, end_drawing, get_touch_point_count,
+    get_touch_position, init_window, set_target_fps, window_should_close,
 };
 
 const MAX_TOUCH_POINTS: usize = 10;
@@ -21,19 +21,19 @@ fn main() {
         }
 
         begin_drawing();
-        clear_background(RAYWHITE);
+        clear_background(Color::RAYWHITE);
 
         for i in 0..(t_count as usize) {
             if touch_positions[i].x <= 0f32 && touch_positions[i].y <= 0f32 {
                 continue;
             }
-            draw_circle_v(touch_positions[i], 34f32, ORANGE);
+            draw_circle_v(touch_positions[i], 34f32, Color::ORANGE);
             draw_text(
                 i.to_string().as_str(),
                 (touch_positions[i].x - 10f32) as i32,
                 (touch_positions[i].y - 70f32) as i32,
                 40,
-                BLACK,
+                Color::BLACK,
             );
         }
 
@@ -42,7 +42,7 @@ fn main() {
             10,
             10,
             20,
-            DARKGRAY,
+            Color::DARKGRAY,
         );
 
         draw_text(
@@ -50,7 +50,7 @@ fn main() {
             10,
             40,
             20,
-            DARKGRAY,
+            Color::DARKGRAY,
         );
 
         end_drawing();

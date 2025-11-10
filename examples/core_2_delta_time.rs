@@ -1,7 +1,6 @@
 use blob_raylib::{
-    BLUE, DARKGRAY, KeyboardKey, RAYWHITE, RED, Vector2, begin_drawing, clear_background, draw_circle_v, draw_text,
-    end_drawing, get_fps, get_frame_time, get_mouse_wheel_move, init_window, is_key_pressed, set_target_fps,
-    window_should_close,
+    Color, KeyboardKey, Vector2, begin_drawing, clear_background, draw_circle_v, draw_text, end_drawing, get_fps,
+    get_frame_time, get_mouse_wheel_move, init_window, is_key_pressed, set_target_fps, window_should_close,
 };
 
 fn main() {
@@ -52,10 +51,10 @@ fn main() {
         }
 
         begin_drawing();
-        clear_background(RAYWHITE);
+        clear_background(Color::RAYWHITE);
 
-        draw_circle_v(delta_circle, circle_radius, RED);
-        draw_circle_v(frame_circle, circle_radius, BLUE);
+        draw_circle_v(delta_circle, circle_radius, Color::RED);
+        draw_circle_v(frame_circle, circle_radius, Color::BLUE);
 
         let fps_text;
         if current_fps <= 0 {
@@ -64,24 +63,24 @@ fn main() {
             fps_text = format!("FPS: {} (target: {})", get_fps(), current_fps);
         }
 
-        draw_text(fps_text.as_str(), 10, 10, 20, DARKGRAY);
+        draw_text(fps_text.as_str(), 10, 10, 20, Color::DARKGRAY);
         draw_text(
             format!("Frame time: {:.3} ms", get_frame_time()).as_str(),
             10,
             30,
             20,
-            DARKGRAY,
+            Color::DARKGRAY,
         );
         draw_text(
             "Use the scroll wheel to change the fps limit, r to reset",
             10,
             50,
             20,
-            DARKGRAY,
+            Color::DARKGRAY,
         );
 
-        draw_text("FUNC: x += GetFrameTime()*speed", 10, 90, 20, RED);
-        draw_text("FUNC: x += speed", 10, 240, 20, BLUE);
+        draw_text("FUNC: x += GetFrameTime()*speed", 10, 90, 20, Color::RED);
+        draw_text("FUNC: x += speed", 10, 240, 20, Color::BLUE);
 
         end_drawing();
     }

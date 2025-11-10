@@ -1,7 +1,10 @@
 #![allow(non_snake_case)]
 
-use crate::{Color, Font, Image, NPatchInfo, Rectangle, RenderTexture2D, Texture2D, TextureCubemap, Vector2};
-use std::ffi::c_uint;
+use crate::{
+    Camera2D, Camera3D, Color, Font, Image, NPatchInfo, Rectangle, RenderTexture2D, Shader, Texture2D, TextureCubemap,
+    Vector2, VrDeviceInfo, VrStereoConfig,
+};
+use std::ffi::{c_double, c_uint};
 use std::os::raw::{c_char, c_float, c_int, c_uchar, c_void};
 
 unsafe extern "C" {
@@ -13,22 +16,91 @@ unsafe extern "C" {
     pub(crate) fn InitWindow(width: c_int, height: c_int, title: *const c_char);
     pub(crate) fn WindowShouldClose() -> bool;
     pub(crate) fn CloseWindow();
+    pub(crate) fn IsWindowReady() -> bool;
+    pub(crate) fn IsWindowFullscreen() -> bool;
+    pub(crate) fn IsWindowHidden() -> bool;
+    pub(crate) fn IsWindowMinimized() -> bool;
+    pub(crate) fn IsWindowMaximized() -> bool;
+    pub(crate) fn IsWindowFocused() -> bool;
+    pub(crate) fn IsWindowResized() -> bool;
+    pub(crate) fn IsWindowState(flag: c_uint) -> bool;
+    pub(crate) fn SetWindowState(flags: c_uint);
+    pub(crate) fn ClearWindowState(flags: c_uint);
+    pub(crate) fn ToggleFullscreen();
+    pub(crate) fn ToggleBorderlessWindowed();
+    pub(crate) fn MaximizeWindow();
+    pub(crate) fn MinimizeWindow();
+    pub(crate) fn RestoreWindow();
+    pub(crate) fn SetWindowIcon(image: Image);
+    pub(crate) fn SetWindowIcons(images: *mut Image, count: c_int);
+    pub(crate) fn SetWindowTitle(title: *const c_char);
+    pub(crate) fn SetWindowPosition(x: c_int, y: c_int);
+    pub(crate) fn SetWindowMonitor(monitor: c_int);
+    pub(crate) fn SetWindowMinSize(width: c_int, height: c_int);
+    pub(crate) fn SetWindowMaxSize(width: c_int, height: c_int);
+    pub(crate) fn SetWindowSize(width: c_int, height: c_int);
+    pub(crate) fn SetWindowOpacity(opacity: c_float);
+    pub(crate) fn SetWindowFocused();
+    pub(crate) fn GetWindowHandle() -> *mut c_void;
+    pub(crate) fn GetScreenWidth() -> c_int;
+    pub(crate) fn GetScreenHeight() -> c_int;
+    pub(crate) fn GetRenderWidth() -> c_int;
+    pub(crate) fn GetRenderHeight() -> c_int;
+    pub(crate) fn GetMonitorCount() -> c_int;
+    pub(crate) fn GetCurrentMonitor() -> c_int;
+    pub(crate) fn GetMonitorPosition(monitor: c_int) -> Vector2;
+    pub(crate) fn GetMonitorWidth(monitor: c_int) -> c_int;
+    pub(crate) fn GetMonitorHeight(monitor: c_int) -> c_int;
+    pub(crate) fn GetMonitorPhysicalWidth(monitor: c_int) -> c_int;
+    pub(crate) fn GetMonitorPhysicalHeight(monitor: c_int) -> c_int;
+    pub(crate) fn GetMonitorRefreshRate(monitor: c_int) -> c_int;
+    pub(crate) fn GetWindowPosition() -> Vector2;
+    pub(crate) fn GetWindowScaleDPI() -> Vector2;
+    pub(crate) fn GetMonitorName(monitor: c_int) -> *const c_char;
+    pub(crate) fn SetClipboardText(text: *const c_char);
+    pub(crate) fn GetClipboardText() -> *const c_char;
+    pub(crate) fn GetClipboardImage() -> Image;
+    pub(crate) fn EnableEventWaiting();
+    pub(crate) fn DisableEventWaiting();
 
     // Cursor related functions
     pub(crate) fn ShowCursor();
     pub(crate) fn HideCursor();
     pub(crate) fn IsCursorHidden() -> bool;
+    pub(crate) fn EnableCursor();
+    pub(crate) fn DisableCursor();
+    pub(crate) fn IsCursorOnScreen() -> bool;
 
     // Drawing-related functions
     pub(crate) fn ClearBackground(color: Color);
     pub(crate) fn BeginDrawing();
     pub(crate) fn EndDrawing();
+    pub(crate) fn BeginMode2D(camera: Camera2D);
+    pub(crate) fn EndMode2D();
+    pub(crate) fn BeginMode3D(camera: Camera3D);
+    pub(crate) fn EndMode3D();
+    pub(crate) fn BeginTextureMode(target: RenderTexture2D);
+    pub(crate) fn EndTextureMode();
+    pub(crate) fn BeginShaderMode(shader: Shader);
+    pub(crate) fn EndShaderMode();
+    pub(crate) fn BeginBlendMode(mode: c_int);
+    pub(crate) fn EndBlendMode();
+    pub(crate) fn BeginScissorMode(x: c_int, y: c_int, width: c_int, height: c_int);
+    pub(crate) fn EndScissorMode();
+    pub(crate) fn BeginVrStereoMode(config: VrStereoConfig);
+    pub(crate) fn EndVrStereoMode();
+
+    // VR stereo config functions for VR simulator
+    pub(crate) fn LoadVrStereoConfig(device: VrDeviceInfo) -> VrStereoConfig;
+    pub(crate) fn UnloadVrStereoConfig(config: VrStereoConfig);
+
     pub(crate) fn DrawText(text: *const c_char, posX: c_int, posY: c_int, fontSize: c_int, color: Color);
 
     // Timing related functions
     pub(crate) fn SetTargetFPS(fps: c_int);
-    pub(crate) fn GetFPS() -> c_int;
     pub(crate) fn GetFrameTime() -> c_float;
+    pub(crate) fn GetTime() -> c_double;
+    pub(crate) fn GetFPS() -> c_int;
 
     // ---------------------------------------------------------------------------------
     // Basic Shapes drawing functions

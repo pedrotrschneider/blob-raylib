@@ -1,167 +1,15 @@
+use crate::bindings::{GetFPS, GetFrameTime, GetTime, SetTargetFPS};
 use crate::{
-    Color, ConfigFlag, CubemapLayout, Font, Gamepad, GamepadAxis, GamepadButton, GestureFlag, Image, KeyboardKey,
-    MouseButton, MouseCursor, NPatchInfo, PixelFormat, Rectangle, RenderTexture2D, Texture2D, TextureCubemap,
-    TextureFilter, TextureWrap, Vector2, bindings,
+    BlendMode, Camera2D, Camera3D, Color, ConfigFlag, CubemapLayout, Font, Gamepad, GamepadAxis, GamepadButton,
+    GestureFlag, Image, KeyboardKey, MouseButton, MouseCursor, NPatchInfo, PixelFormat, Rectangle, RenderTexture2D,
+    Shader, Texture2D, TextureCubemap, TextureFilter, TextureWrap, Vector2, VrDeviceInfo, VrStereoConfig, bindings,
 };
 use std::ffi::{CStr, CString};
 use std::os::raw::{c_float, c_int, c_void};
 use std::slice;
 
-pub const LIGHTGRAY: Color = Color {
-    r: 200,
-    g: 200,
-    b: 200,
-    a: 255,
-};
-pub const GRAY: Color = Color {
-    r: 130,
-    g: 130,
-    b: 130,
-    a: 255,
-};
-pub const DARKGRAY: Color = Color {
-    r: 80,
-    g: 80,
-    b: 80,
-    a: 255,
-}; // Dark Gray
-pub const YELLOW: Color = Color {
-    r: 253,
-    g: 249,
-    b: 0,
-    a: 255,
-}; // Yellow
-pub const GOLD: Color = Color {
-    r: 255,
-    g: 203,
-    b: 0,
-    a: 255,
-}; // Gold
-pub const ORANGE: Color = Color {
-    r: 255,
-    g: 161,
-    b: 0,
-    a: 255,
-}; // Orange
-pub const PINK: Color = Color {
-    r: 255,
-    g: 109,
-    b: 194,
-    a: 255,
-}; // Pink
-pub const RED: Color = Color {
-    r: 230,
-    g: 41,
-    b: 55,
-    a: 255,
-}; // Red
-pub const MAROON: Color = Color {
-    r: 190,
-    g: 33,
-    b: 55,
-    a: 255,
-}; // Maroon
-pub const GREEN: Color = Color {
-    r: 0,
-    g: 228,
-    b: 48,
-    a: 255,
-}; // Green
-pub const LIME: Color = Color {
-    r: 0,
-    g: 158,
-    b: 47,
-    a: 255,
-}; // Lime
-pub const DARKGREEN: Color = Color {
-    r: 0,
-    g: 117,
-    b: 44,
-    a: 255,
-}; // Dark Green
-pub const SKYBLUE: Color = Color {
-    r: 102,
-    g: 191,
-    b: 255,
-    a: 255,
-}; // Sky Blue
-pub const BLUE: Color = Color {
-    r: 0,
-    g: 121,
-    b: 241,
-    a: 255,
-}; // Blue
-pub const DARKBLUE: Color = Color {
-    r: 0,
-    g: 82,
-    b: 172,
-    a: 255,
-}; // Dark Blue
-pub const PURPLE: Color = Color {
-    r: 200,
-    g: 122,
-    b: 255,
-    a: 255,
-}; // Purple
-pub const VIOLET: Color = Color {
-    r: 135,
-    g: 60,
-    b: 190,
-    a: 255,
-}; // Violet
-pub const DARKPURPLE: Color = Color {
-    r: 112,
-    g: 31,
-    b: 126,
-    a: 255,
-}; // Dark Purple
-pub const BEIGE: Color = Color {
-    r: 211,
-    g: 176,
-    b: 131,
-    a: 255,
-}; // Beige
-pub const BROWN: Color = Color {
-    r: 127,
-    g: 106,
-    b: 79,
-    a: 255,
-}; // Brown
-pub const DARKBROWN: Color = Color {
-    r: 76,
-    g: 63,
-    b: 47,
-    a: 255,
-}; // Dark Brown
-
-pub const WHITE: Color = Color {
-    r: 255,
-    g: 255,
-    b: 255,
-    a: 255,
-}; // White
-pub const BLACK: Color = Color {
-    r: 0,
-    g: 0,
-    b: 0,
-    a: 255,
-}; // Black
-pub const BLANK: Color = Color { r: 0, g: 0, b: 0, a: 0 }; // Blank (Transparent)
-pub const MAGENTA: Color = Color {
-    r: 255,
-    g: 0,
-    b: 255,
-    a: 255,
-}; // Magenta
-pub const RAYWHITE: Color = Color {
-    r: 245,
-    g: 245,
-    b: 245,
-    a: 255,
-}; // My own White (raylib logo)
-
 // Window related wrappers
-
+/// Initialize window and OpenGL context
 pub fn init_window(width: i32, height: i32, title: &str) {
     let c_text = CString::new(title).unwrap();
     unsafe {
@@ -169,40 +17,410 @@ pub fn init_window(width: i32, height: i32, title: &str) {
     };
 }
 
+/// Close window and unload OpenGL context
 pub fn window_should_close() -> bool {
     return unsafe { bindings::WindowShouldClose() };
 }
 
+/// Check if application should close (KEY_ESCAPE pressed or windows close icon clicked)
 pub fn close_window() {
     unsafe { bindings::CloseWindow() };
 }
 
-// Timing related wrappers
-
-pub fn set_target_fps(fps: i32) {
-    unsafe { bindings::SetTargetFPS(fps) };
+/// Check if window has been initialized successfully
+pub fn is_window_ready() -> bool {
+    unsafe { bindings::IsWindowReady() }
 }
 
-pub fn get_fps() -> i32 {
-    return unsafe { bindings::GetFPS() };
+/// Check if window is currently fullscreen
+pub fn is_window_fullscreen() -> bool {
+    unsafe { bindings::IsWindowFullscreen() }
 }
 
-pub fn get_frame_time() -> f32 {
-    return unsafe { bindings::GetFrameTime() };
+/// Check if window is currently hidden
+pub fn is_window_hidden() -> bool {
+    unsafe { bindings::IsWindowHidden() }
+}
+
+/// Check if window is currently minimized
+pub fn is_window_minimized() -> bool {
+    unsafe { bindings::IsWindowMinimized() }
+}
+
+/// Check if window is currently maximized
+pub fn is_window_maximized() -> bool {
+    unsafe { bindings::IsWindowMaximized() }
+}
+
+/// Check if window is currently focused
+pub fn is_window_focused() -> bool {
+    unsafe { bindings::IsWindowFocused() }
+}
+
+/// Check if window has been resized last frame
+pub fn is_window_resized() -> bool {
+    unsafe { bindings::IsWindowResized() }
+}
+
+/// Check if one specific window flag is enabled
+pub fn is_window_state(flag: ConfigFlag) -> bool {
+    unsafe { bindings::IsWindowState(flag.value()) }
+}
+
+/// Set window configuration state using flags
+pub fn set_window_state(flags: ConfigFlag) {
+    unsafe { bindings::SetWindowState(flags.value()) }
+}
+
+/// Clear window configuration state flags
+pub fn clear_window_state(flags: ConfigFlag) {
+    unsafe { bindings::ClearWindowState(flags.value()) }
+}
+
+/// Toggle window state: fullscreen/windowed
+pub fn toggle_fullscreen() {
+    unsafe { bindings::ToggleFullscreen() }
+}
+
+/// Toggle window state: borderless windowed
+pub fn toggle_borderless_windowed() {
+    unsafe { bindings::ToggleBorderlessWindowed() }
+}
+
+/// Set window state: maximized, if resizable
+pub fn maximize_window() {
+    unsafe { bindings::MaximizeWindow() }
+}
+
+/// Set window state: minimized, if resizable
+pub fn minimize_window() {
+    unsafe { bindings::MinimizeWindow() }
+}
+
+/// Restore window from being minimized/maximized
+pub fn restore_window() {
+    unsafe { bindings::RestoreWindow() }
+}
+
+/// Set icon for window (single image, RGBA 32bit)
+pub fn set_window_icon(image: Image) {
+    unsafe { bindings::SetWindowIcon(image) }
+}
+
+/// Set icon for window (multiple images, RGBA 32bit)
+pub fn set_window_icons(images: &mut [Image]) {
+    unsafe { bindings::SetWindowIcons(images.as_mut_ptr(), images.len() as c_int) }
+}
+
+/// Set title for window
+pub fn set_window_title(title: &str) {
+    let c_title = CString::new(title).unwrap();
+    unsafe { bindings::SetWindowTitle(c_title.as_ptr()) }
+}
+
+/// Set window position on screen
+pub fn set_window_position(x: i32, y: i32) {
+    unsafe { bindings::SetWindowPosition(x as c_int, y as c_int) }
+}
+
+/// Set monitor for the current window
+pub fn set_window_monitor(monitor: i32) {
+    unsafe { bindings::SetWindowMonitor(monitor as c_int) }
+}
+
+/// Set window minimum dimensions (for FLAG_WINDOW_RESIZABLE)
+pub fn set_window_min_size(width: i32, height: i32) {
+    unsafe { bindings::SetWindowMinSize(width as c_int, height as c_int) }
+}
+
+/// Set window maximum dimensions (for FLAG_WINDOW_RESIZABLE)
+pub fn set_window_max_size(width: i32, height: i32) {
+    unsafe { bindings::SetWindowMaxSize(width as c_int, height as c_int) }
+}
+
+/// Set window dimensions
+pub fn set_window_size(width: i32, height: i32) {
+    unsafe { bindings::SetWindowSize(width as c_int, height as c_int) }
+}
+
+/// Set window opacity [0.0f..1.0f]
+pub fn set_window_opacity(opacity: f32) {
+    unsafe { bindings::SetWindowOpacity(opacity as c_float) }
+}
+
+/// Set window focused
+pub fn set_window_focused() {
+    unsafe { bindings::SetWindowFocused() }
+}
+
+/// Get native window handle
+pub fn get_window_handle() -> *mut c_void {
+    unsafe { bindings::GetWindowHandle() }
+}
+
+/// Get current screen width
+pub fn get_screen_width() -> i32 {
+    unsafe { bindings::GetScreenWidth() }
+}
+
+/// Get current screen height
+pub fn get_screen_height() -> i32 {
+    unsafe { bindings::GetScreenHeight() }
+}
+
+/// Get current render width (it considers HiDPI)
+pub fn get_render_width() -> i32 {
+    unsafe { bindings::GetRenderWidth() }
+}
+
+/// Get current render height (it considers HiDPI)
+pub fn get_render_height() -> i32 {
+    unsafe { bindings::GetRenderHeight() }
+}
+
+/// Get number of connected monitors
+pub fn get_monitor_count() -> i32 {
+    unsafe { bindings::GetMonitorCount() }
+}
+
+/// Get current monitor where window is placed
+pub fn get_current_monitor() -> i32 {
+    unsafe { bindings::GetCurrentMonitor() }
+}
+
+/// Get specified monitor position
+pub fn get_monitor_position(monitor: i32) -> Vector2 {
+    unsafe { bindings::GetMonitorPosition(monitor as c_int) }
+}
+
+/// Get specified monitor width (current video mode used by monitor)
+pub fn get_monitor_width(monitor: i32) -> i32 {
+    unsafe { bindings::GetMonitorWidth(monitor as c_int) }
+}
+
+/// Get specified monitor height (current video mode used by monitor)
+pub fn get_monitor_height(monitor: i32) -> i32 {
+    unsafe { bindings::GetMonitorHeight(monitor as c_int) }
+}
+
+/// Get specified monitor physical width in millimetres
+pub fn get_monitor_physical_width(monitor: i32) -> i32 {
+    unsafe { bindings::GetMonitorPhysicalWidth(monitor as c_int) }
+}
+
+/// Get specified monitor physical height in millimetres
+pub fn get_monitor_physical_height(monitor: i32) -> i32 {
+    unsafe { bindings::GetMonitorPhysicalHeight(monitor as c_int) }
+}
+
+/// Get specified monitor refresh rate
+pub fn get_monitor_refresh_rate(monitor: i32) -> i32 {
+    unsafe { bindings::GetMonitorRefreshRate(monitor as c_int) }
+}
+
+/// Get window position XY on monitor
+pub fn get_window_position() -> Vector2 {
+    unsafe { bindings::GetWindowPosition() }
+}
+
+/// Get window scale DPI factor
+pub fn get_window_scale_dpi() -> Vector2 {
+    unsafe { bindings::GetWindowScaleDPI() }
+}
+
+/// Get the human-readable, UTF-8 encoded name of the specified monitor
+pub fn get_monitor_name(monitor: i32) -> &'static str {
+    unsafe {
+        let c_str = bindings::GetMonitorName(monitor as c_int);
+        if c_str.is_null() {
+            ""
+        } else {
+            CStr::from_ptr(c_str).to_str().unwrap_or("")
+        }
+    }
+}
+
+/// Set clipboard text content
+pub fn set_clipboard_text(text: &str) {
+    let c_text = CString::new(text).unwrap();
+    unsafe { bindings::SetClipboardText(c_text.as_ptr()) }
+}
+
+/// Get clipboard text content
+/// NOTE: This wrapper allocates a new String.
+pub fn get_clipboard_text() -> String {
+    unsafe {
+        let c_str = bindings::GetClipboardText();
+        if c_str.is_null() {
+            String::new()
+        } else {
+            CStr::from_ptr(c_str).to_string_lossy().into_owned()
+        }
+    }
+}
+
+/// Get clipboard image content
+pub fn get_clipboard_image() -> Image {
+    unsafe { bindings::GetClipboardImage() }
+}
+
+/// Enable waiting for events on EndDrawing(), no automatic event polling
+pub fn enable_event_waiting() {
+    unsafe { bindings::EnableEventWaiting() }
+}
+
+/// Disable waiting for events on EndDrawing(), automatic events polling
+pub fn disable_event_waiting() {
+    unsafe { bindings::DisableEventWaiting() }
+}
+
+// Cursor related wrappers
+/// Shows cursor
+pub fn show_cursor() {
+    unsafe { bindings::ShowCursor() };
+}
+
+/// Hides cursor
+pub fn hide_cursor() {
+    unsafe { bindings::HideCursor() };
+}
+
+/// Check if cursor is not visible
+pub fn is_cursor_hidden() -> bool {
+    return unsafe { bindings::IsCursorHidden() };
+}
+
+/// Enables cursor (unlock cursor)
+pub fn enable_cursor() {
+    unsafe { bindings::EnableCursor() }
+}
+
+/// Disables cursor (lock cursor)
+pub fn disable_cursor() {
+    unsafe { bindings::DisableCursor() }
+}
+
+/// Check if cursor is on the screen
+pub fn is_cursor_on_screen() -> bool {
+    unsafe { bindings::IsCursorOnScreen() }
 }
 
 // Drawing related wrappers
+/// Set background color (framebuffer clear color)
+pub fn clear_background(color: Color) {
+    unsafe { bindings::ClearBackground(color) };
+}
 
+/// Setup canvas (framebuffer) to start drawing
 pub fn begin_drawing() {
     unsafe { bindings::BeginDrawing() };
 }
 
+/// End canvas drawing and swap buffers (double buffering)
 pub fn end_drawing() {
     unsafe { bindings::EndDrawing() };
 }
 
-pub fn clear_background(color: Color) {
-    unsafe { bindings::ClearBackground(color) };
+/// Begin 2D mode with custom camera (2D)
+pub fn begin_mode_2d(camera: Camera2D) {
+    unsafe { bindings::BeginMode2D(camera) }
+}
+
+/// Ends 2D mode with custom camera
+pub fn end_mode_2d() {
+    unsafe { bindings::EndMode2D() }
+}
+
+/// Begin 3D mode with custom camera (3D)
+pub fn begin_mode_3d(camera: Camera3D) {
+    unsafe { bindings::BeginMode3D(camera) }
+}
+
+/// Ends 3D mode and returns to default 2D orthographic mode
+pub fn end_mode_3d() {
+    unsafe { bindings::EndMode3D() }
+}
+
+/// Begin drawing to render texture
+pub fn begin_texture_mode(target: RenderTexture2D) {
+    unsafe { bindings::BeginTextureMode(target) }
+}
+
+/// Ends drawing to render texture
+pub fn end_texture_mode() {
+    unsafe { bindings::EndTextureMode() }
+}
+
+/// Begin custom shader drawing
+pub fn begin_shader_mode(shader: Shader) {
+    unsafe { bindings::BeginShaderMode(shader) }
+}
+
+/// End custom shader drawing (use default shader)
+pub fn end_shader_mode() {
+    unsafe { bindings::EndShaderMode() }
+}
+
+/// Begin blending mode
+pub fn begin_blend_mode(mode: BlendMode) {
+    unsafe { bindings::BeginBlendMode(mode as c_int) }
+}
+
+/// End blending mode (reset to default: alpha blending)
+pub fn end_blend_mode() {
+    unsafe { bindings::EndBlendMode() }
+}
+
+/// Begin scissor mode (define screen area for following drawing)
+pub fn begin_scissor_mode(x: i32, y: i32, width: i32, height: i32) {
+    unsafe { bindings::BeginScissorMode(x as c_int, y as c_int, width as c_int, height as c_int) }
+}
+
+/// End scissor mode
+pub fn end_scissor_mode() {
+    unsafe { bindings::EndScissorMode() }
+}
+
+/// Begin stereo rendering (requires VR simulator)
+pub fn begin_vr_stereo_mode(config: VrStereoConfig) {
+    unsafe { bindings::BeginVrStereoMode(config) }
+}
+
+/// End stereo rendering (requires VR simulator)
+pub fn end_vr_stereo_mode() {
+    unsafe { bindings::EndVrStereoMode() }
+}
+
+// VR stereo config functions for VR simulator
+/// Load VR stereo config for VR simulator device parameters
+pub fn load_vr_stereo_config(device: VrDeviceInfo) -> VrStereoConfig {
+    unsafe { bindings::LoadVrStereoConfig(device) }
+}
+
+/// Unload VR stereo config
+pub fn unload_vr_stereo_config(config: VrStereoConfig) {
+    unsafe { bindings::UnloadVrStereoConfig(config) }
+}
+
+// Timing related wrappers
+/// Set target FPS (maximum)
+pub fn set_target_fps(fps: i32) {
+    unsafe { SetTargetFPS(fps) };
+}
+
+/// Get time in seconds for last frame drawn (delta time)
+pub fn get_frame_time() -> f32 {
+    return unsafe { GetFrameTime() };
+}
+
+/// Get elapsed time in seconds since InitWindow()
+pub fn get_time() -> f64 {
+    return unsafe { GetTime() };
+}
+
+/// Get current FPS
+pub fn get_fps() -> i32 {
+    return unsafe { GetFPS() };
 }
 
 pub fn draw_text(text: &str, pos_x: i32, pos_y: i32, font_size: i32, color: Color) {
@@ -292,10 +510,12 @@ pub fn set_exit_key(key: Option<KeyboardKey>) {
 // Input-related functions: gamepad
 // ---------------------------------------------------------------------------------
 
+/// Check if a gamepad is available
 pub fn is_gamepad_available(gamepad: &Gamepad) -> bool {
     return unsafe { bindings::IsGamepadAvailable(gamepad.id) };
 }
 
+/// Get gamepad internal name id
 pub fn get_gamepad_name(gamepad: &Gamepad) -> Option<&'static str> {
     return unsafe {
         let ptr = bindings::GetGamepadName(gamepad.id);
@@ -309,22 +529,27 @@ pub fn get_gamepad_name(gamepad: &Gamepad) -> Option<&'static str> {
     };
 }
 
+/// Check if a gamepad button has been pressed once
 pub fn is_gamepad_button_pressed(gamepad: &Gamepad, button: GamepadButton) -> bool {
     unsafe { bindings::IsGamepadButtonPressed(gamepad.id, button as i32) }
 }
 
+/// Check if a gamepad button is being pressed
 pub fn is_gamepad_button_down(gamepad: &Gamepad, button: GamepadButton) -> bool {
     unsafe { bindings::IsGamepadButtonDown(gamepad.id, button as i32) }
 }
 
+/// Check if a gamepad button has been released once
 pub fn is_gamepad_button_released(gamepad: &Gamepad, button: GamepadButton) -> bool {
     unsafe { bindings::IsGamepadButtonReleased(gamepad.id, button as i32) }
 }
 
+/// Check if a gamepad button is NOT being pressed
 pub fn is_gamepad_button_up(gamepad: &Gamepad, button: GamepadButton) -> bool {
     unsafe { bindings::IsGamepadButtonUp(gamepad.id, button as i32) }
 }
 
+/// Get the last gamepad button pressed
 pub fn get_gamepad_button_pressed() -> Option<GamepadButton> {
     unsafe {
         let button = bindings::GetGamepadButtonPressed();
@@ -332,21 +557,25 @@ pub fn get_gamepad_button_pressed() -> Option<GamepadButton> {
     }
 }
 
+/// Get axis count for a gamepad
 pub fn get_gamepad_axis_count(gamepad: &Gamepad) -> i32 {
     unsafe { bindings::GetGamepadAxisCount(gamepad.id) }
 }
 
+/// Get movement value for a gamepad axis
 pub fn get_gamepad_axis_movement(gamepad: &Gamepad, axis: GamepadAxis) -> f32 {
     unsafe { bindings::GetGamepadAxisMovement(gamepad.id, axis as i32) }
 }
 
+/// Set internal gamepad mappings (SDL_GameControllerDB)
 pub fn set_gamepad_mappings(mappings: &str) -> i32 {
     let c_str = CString::new(mappings).unwrap();
     unsafe { bindings::SetGamepadMappings(c_str.as_ptr()) }
 }
 
-pub fn set_gamepad_vibration(gamepad: &Gamepad, left_motor: f32, right_motor: f32, duration: f32) {
-    unsafe { bindings::SetGamepadVibration(gamepad.id, left_motor, right_motor, duration) }
+/// Set gamepad vibration for both motors (duration in seconds)
+pub fn set_gamepad_vibration(gamepad: &Gamepad, left_motor: f32, right_motor: f32, seconds: f32) {
+    unsafe { bindings::SetGamepadVibration(gamepad.id, left_motor, right_motor, seconds) }
 }
 
 // ---------------------------------------------------------------------------------
@@ -494,20 +723,6 @@ pub fn get_gesture_pinch_vector() -> Vector2 {
 /// Get gesture pinch angle
 pub fn get_gesture_pinch_angle() -> f32 {
     unsafe { bindings::GetGesturePinchAngle() }
-}
-
-// Cursor related wrappers
-
-pub fn show_cursor() {
-    unsafe { bindings::ShowCursor() };
-}
-
-pub fn hide_cursor() {
-    unsafe { bindings::HideCursor() };
-}
-
-pub fn is_cursor_hidden() -> bool {
-    return unsafe { bindings::IsCursorHidden() };
 }
 
 // Misc. wrappers
