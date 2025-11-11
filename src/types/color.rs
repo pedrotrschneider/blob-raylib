@@ -218,3 +218,7 @@ impl Color {
         return Self { r, g, b, a };
     }
 }
+
+impl Color {
+
+}

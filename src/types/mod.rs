@@ -10,6 +10,7 @@ mod physics;
 mod rendering;
 mod texture;
 mod virtual_reality;
+mod graphics;
 
 pub use audio::*;
 pub use camera::*;
@@ -23,6 +24,8 @@ pub use physics::*;
 pub use rendering::*;
 pub use texture::*;
 pub use virtual_reality::*;
+pub use graphics::*;
+use crate::{get_fps, get_frame_time, get_time, set_target_fps, wait_time};
 
 /// File path list
 #[repr(C)]
@@ -48,6 +51,18 @@ pub struct AutomationEvent {
     pub params: [i32; 4],
 }
 
+/// Automation event list
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct AutomationEventList {
+    /// Events max entries
+    pub capacity: u32,
+    /// Events entries count
+    pub count: u32,
+    /// Events entries
+    pub events: *mut AutomationEvent,
+}
+
 /// Trace log level
 /// NOTE: Organized by priority level
 #[repr(u32)]
@@ -69,4 +84,28 @@ pub enum TraceLogLevel {
     Fatal,
     /// Disable logging
     None,
+}
+
+pub struct Time;
+
+impl Time {
+    pub fn set_target_fps(fps: i32) {
+        set_target_fps(fps);
+    }
+
+    pub fn frame_time() -> f32 {
+        return get_frame_time();
+    }
+
+    pub fn time() -> f64 {
+        return get_time();
+    }
+
+    pub fn fps() -> i32 {
+        return get_fps();
+    }
+
+    pub fn wait(seconds: f64) {
+        wait_time(seconds);
+    }
 }

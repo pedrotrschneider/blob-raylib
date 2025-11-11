@@ -1,4 +1,4 @@
-use crate::{Color, Matrix, Texture2D, Transform};
+use crate::{begin_shader_mode, end_shader_mode, get_shader_location, is_shader_valid, load_shader, load_shader_from_memory, set_shader_value, set_shader_value_matrix, set_shader_value_v, unload_shader, Color, Matrix, Texture2D, Transform};
 
 /// Material map index
 #[repr(u32)]
@@ -200,14 +200,82 @@ pub struct Mesh {
     pub vbo_id: *mut u32,
 }
 
+pub struct ShaderLocation(i32);
+
+impl From<i32> for ShaderLocation {
+    fn from(location: i32) -> Self {
+        return Self(location);
+    }
+}
+
+impl Into<i32> for ShaderLocation {
+    fn into(self) -> i32 {
+        return self.0;
+    }
+}
+
 /// Shader
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug)]
 pub struct Shader {
     /// Shader program id
     pub id: u32,
     /// Shader locations array (RL_MAX_SHADER_LOCATIONS)
     pub locs: *mut u32,
+}
+
+impl Shader {
+    pub fn load(vs_filename: &str, fs_filename: &str) -> Shader {
+        return load_shader(vs_filename, fs_filename);
+    }
+
+    pub fn from_memory(vs_code: &str, fs_code: &str) -> Shader {
+        return load_shader_from_memory(vs_code, fs_code);
+    }
+
+    pub fn begin_mode(&self) {
+        begin_shader_mode(self.clone());
+    }
+
+    pub fn end_mode(&self) {
+        end_shader_mode();
+    }
+
+    pub fn is_valid(&self) -> bool {
+        return is_shader_valid(self.clone());
+    }
+
+    pub fn uniform_location(&self, uniform_name: &str) -> ShaderLocation {
+        return get_shader_location(self.clone(), uniform_name);
+    }
+
+    pub fn attrib_location(&self, attrib_name: &str) -> ShaderLocation {
+        return get_shader_location(self.clone(), attrib_name);
+    }
+
+    pub fn set<T>(&self, location: ShaderLocation, value: &T, uniform_type: ShaderUniformDataType) {
+        set_shader_value(self.clone(), location, value, uniform_type);
+    }
+
+    pub fn set_vector<T>(&self, location: ShaderLocation, value: &[T], uniform_type: ShaderUniformDataType) {
+        set_shader_value_v(self.clone(), location, value, uniform_type);
+    }
+
+    pub fn set_matrix(&self, location: ShaderLocation, mat: Matrix) {
+        set_shader_value_matrix(self.clone(), location, mat);
+    }
+}
+
+impl Clone for Shader {
+    fn clone(&self) -> Self {
+        return Self{ id: self.id, locs: self.locs };
+    }
+}
+
+impl Drop for Shader {
+    fn drop(&mut self) {
+        unload_shader(self.clone());
+    }
 }
 
 /// MaterialMap
@@ -224,14 +292,20 @@ pub struct MaterialMap {
 
 /// Material, includes shader and maps
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug)]
 pub struct Material {
     /// Material shader
     pub shader: Shader,
-    /// Material maps array (MAX_MATERIAL_MAPS)
+    /// Material maps array
     pub maps: *mut MaterialMap,
     /// Material generic parameters (if required)
     pub params: [f32; 4],
+}
+
+impl Clone for Material {
+    fn clone(&self) -> Self {
+        return Self { shader: self.shader.clone(), maps: self.maps, params: self.params };
+    }
 }
 
 /// Bone, skeletal animation bone
