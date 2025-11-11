@@ -1,5 +1,5 @@
 use crate::bindings::{AudioCallback, GetFPS, GetFrameTime, GetTime, LoadFileDataCallback, LoadFileTextCallback, SaveFileDataCallback, SaveFileTextCallback, SetTargetFPS, TraceLogCallback};
-use crate::{bindings, AudioStream, AutomationEvent, AutomationEventList, BlendMode, BoundingBox, Camera, Camera2D, Camera3D, CameraMode, Color, ConfigFlag, CubemapLayout, FilePathList, Font, FontType, Gamepad, GamepadAxis, GamepadButton, GestureFlag, GlyphInfo, Image, KeyboardKey, Material, MaterialMapIndex, Matrix, Mesh, Model, ModelAnimation, Monitor, MouseButton, MouseCursor, Music, NPatchInfo, PixelFormat, Ray, RayCollision, Rectangle, RenderTexture2D, Shader, ShaderLocation, ShaderLocationIndex, ShaderUniformDataType, Sound, Texture2D, TextureCubemap, TextureFilter, TextureWrap, TraceLogLevel, Vector2, Vector3, Vector4, VrDeviceInfo, VrStereoConfig, Wave};
+use crate::{bindings, AudioStream, AutomationEvent, AutomationEventList, BlendMode, BoundingBox, Camera, Camera2D, Camera3D, CameraMode, Color, ConfigFlag, CubemapLayout, FilePathList, Font, FontType, Gamepad, GamepadAxis, GamepadButton, GestureFlag, GlyphInfo, Image, KeyboardKey, Material, MaterialMapIndex, Matrix, Mesh, Model, ModelAnimation, Monitor, MouseButton, MouseCursor, Music, NPatchInfo, PixelFormat, Ray, RayCollision, Rectangle, RenderTexture2D, Shader, ShaderLocation, ShaderUniformDataType, Sound, Texture2D, TextureCubemap, TextureFilter, TextureWrap, TraceLogLevel, Vector2, Vector3, Vector4, VrDeviceInfo, VrStereoConfig, Wave};
 use std::ffi::{c_char, c_double, c_uchar, c_uint, CStr, CString};
 use std::os::raw::{c_float, c_int, c_void};
 use std::slice;
@@ -2727,14 +2727,14 @@ pub fn get_color(hex_value: u32) -> Color {
 /// # Safety
 /// This function is unsafe because it dereferences a raw pointer.
 pub unsafe fn get_pixel_color(src_ptr: *mut c_void, format: PixelFormat) -> Color {
-    bindings::GetPixelColor(src_ptr, format as c_int)
+    unsafe {bindings::GetPixelColor(src_ptr, format as c_int)}
 }
 
 /// Set color formatted into destination pixel pointer
 /// # Safety
 /// This function is unsafe because it writes to a raw pointer.
 pub unsafe fn set_pixel_color(dst_ptr: *mut c_void, color: Color, format: PixelFormat) {
-    bindings::SetPixelColor(dst_ptr, color, format as c_int)
+    unsafe {bindings::SetPixelColor(dst_ptr, color, format as c_int)}
 }
 
 /// Get pixel data size in bytes for certain format
@@ -2834,7 +2834,7 @@ pub fn load_font_data(
         if glyphs_ptr.is_null() {
             return Vec::new();
         }
-        let slice = std::slice::from_raw_parts(glyphs_ptr, glyph_count as usize);
+        let slice = slice::from_raw_parts(glyphs_ptr, glyph_count as usize);
         let vec = slice.to_vec();
         bindings::UnloadFontData(glyphs_ptr, glyph_count);
         vec
@@ -2864,7 +2864,7 @@ pub fn gen_image_font_atlas(
         if recs_ptr.is_null() {
             return (image, Vec::new());
         }
-        let slice = std::slice::from_raw_parts(recs_ptr, glyph_count as usize);
+        let slice = slice::from_raw_parts(recs_ptr, glyph_count as usize);
         let vec = slice.to_vec();
         bindings::MemFree(recs_ptr as *mut c_void); // Corresponds to RL_FREE
         (image, vec)
@@ -3054,7 +3054,7 @@ pub fn load_codepoints(text: &str) -> Vec<i32> {
         if codepoints_ptr.is_null() {
             return Vec::new();
         }
-        let slice = std::slice::from_raw_parts(codepoints_ptr, count as usize);
+        let slice = slice::from_raw_parts(codepoints_ptr, count as usize);
         let vec = slice.to_vec();
         bindings::UnloadCodepoints(codepoints_ptr);
         vec
@@ -3119,7 +3119,7 @@ pub fn load_text_lines(text: &str) -> Vec<String> {
         if lines_ptr.is_null() {
             return Vec::new();
         }
-        let lines_slice = std::slice::from_raw_parts(lines_ptr, count as usize);
+        let lines_slice = slice::from_raw_parts(lines_ptr, count as usize);
         let mut lines_vec: Vec<String> = Vec::with_capacity(count as usize);
         for &line_ptr in lines_slice {
             if !line_ptr.is_null() {
@@ -3138,7 +3138,7 @@ pub fn load_text_lines(text: &str) -> Vec<String> {
 /// to hold the contents of `src`.
 pub unsafe fn text_copy(dst: *mut c_char, src: &str) -> i32 {
     let c_src = CString::new(src).unwrap();
-    bindings::TextCopy(dst, c_src.as_ptr())
+    unsafe { bindings::TextCopy(dst, c_src.as_ptr()) }
 }
 
 /// Check if two text string are equal
@@ -3299,7 +3299,7 @@ pub fn text_split(text: &str, delimiter: char) -> Vec<String> {
         if lines_ptr.is_null() {
             return Vec::new();
         }
-        let lines_slice = std::slice::from_raw_parts(lines_ptr, count as usize);
+        let lines_slice = slice::from_raw_parts(lines_ptr, count as usize);
         let mut lines_vec: Vec<String> = Vec::with_capacity(count as usize);
         for &line_ptr in lines_slice {
             if !line_ptr.is_null() {
@@ -3318,7 +3318,7 @@ pub fn text_split(text: &str, delimiter: char) -> Vec<String> {
 /// `position` will be updated in place.
 pub unsafe fn text_append(text: *mut c_char, append: &str, position: &mut i32) {
     let c_append = CString::new(append).unwrap();
-    bindings::TextAppend(text, c_append.as_ptr(), position as *mut c_int)
+    unsafe { bindings::TextAppend(text, c_append.as_ptr(), position as *mut c_int) }
 }
 
 /// Find first text occurrence within a string
@@ -3834,7 +3834,7 @@ pub fn update_mesh_buffer<T>(mesh: Mesh, index: i32, data: &[T], offset: i32) {
             mesh,
             index as c_int,
             data.as_ptr() as *const c_void,
-            (data.len() * std::mem::size_of::<T>()) as c_int,
+            (data.len() * size_of::<T>()) as c_int,
             offset as c_int,
         )
     }
@@ -4030,14 +4030,14 @@ pub fn load_model_animations(filename: &str) -> Vec<ModelAnimation> {
     let c_filename = CString::new(filename).unwrap();
     let mut count: c_int = 0;
     unsafe {
-        let anims_ptr =
+        let animations_ptr =
             bindings::LoadModelAnimations(c_filename.as_ptr(), &mut count as *mut c_int);
-        if anims_ptr.is_null() {
+        if animations_ptr.is_null() {
             return Vec::new();
         }
-        let slice = std::slice::from_raw_parts_mut(anims_ptr, count as usize);
+        let slice = slice::from_raw_parts_mut(animations_ptr, count as usize);
         let vec = slice.to_vec();
-        bindings::UnloadModelAnimations(anims_ptr, count);
+        bindings::UnloadModelAnimations(animations_ptr, count);
         vec
     }
 }
@@ -4318,7 +4318,7 @@ pub fn load_wave_samples(wave: Wave) -> Vec<f32> {
             return Vec::new();
         }
         let count = (wave.frame_count * wave.channels) as usize;
-        let slice = std::slice::from_raw_parts(samples_ptr, count);
+        let slice = slice::from_raw_parts(samples_ptr, count);
         let vec = slice.to_vec();
         bindings::UnloadWaveSamples(samples_ptr);
         vec

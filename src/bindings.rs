@@ -991,7 +991,7 @@ unsafe extern "C" {
     pub(crate) fn TextCopy(dst: *mut c_char, src: *const c_char) -> c_int;
     pub(crate) fn TextIsEqual(text1: *const c_char, text2: *const c_char) -> bool;
     pub(crate) fn TextLength(text: *const c_char) -> c_uint;
-    pub(crate) fn TextFormat(text: *const c_char, ...) -> *const c_char;
+    // pub(crate) fn TextFormat(text: *const c_char, ...) -> *const c_char;
     pub(crate) fn TextSubtext(text: *const c_char, position: c_int, length: c_int)
                               -> *const c_char;
     pub(crate) fn TextRemoveSpaces(text: *const c_char) -> *const c_char;

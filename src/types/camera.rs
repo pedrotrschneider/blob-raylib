@@ -1,5 +1,4 @@
 use crate::{begin_mode_2d, begin_mode_3d, end_mode_2d, end_mode_3d, get_camera_matrix, get_camera_matrix_2d, get_screen_to_world_2d, get_screen_to_world_ray, get_screen_to_world_ray_ex, get_world_to_screen, get_world_to_screen_2d, get_world_to_screen_ex, update_camera, update_camera_pro, Matrix, Ray, Vector2, Vector3};
-use crate::bindings::BeginMode2D;
 
 /// Camera system modes
 #[repr(i32)]
