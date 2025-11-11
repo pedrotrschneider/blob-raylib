@@ -4,8 +4,7 @@ use crate::{
     Camera2D, Camera3D, Color, Font, Image, NPatchInfo, Rectangle, RenderTexture2D, Shader, Texture2D, TextureCubemap,
     Vector2, VrDeviceInfo, VrStereoConfig,
 };
-use std::ffi::{c_double, c_uint};
-use std::os::raw::{c_char, c_float, c_int, c_uchar, c_void};
+use std::ffi::{c_char, c_double, c_float, c_int, c_uchar, c_uint, c_void};
 
 unsafe extern "C" {
     //------------------------------------------------------------------------------------

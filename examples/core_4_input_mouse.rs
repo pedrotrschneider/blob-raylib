@@ -12,7 +12,7 @@ fn main() {
     set_target_fps(60);
 
     let mut ball_position;
-    let mut ball_color = Color::DARKBLUE;
+    let mut ball_color = Color::DARK_BLUE;
 
     while !window_should_close() {
         if is_key_pressed(KeyboardKey::H) {
@@ -30,7 +30,7 @@ fn main() {
         } else if is_mouse_button_pressed(MouseButton::Middle) {
             ball_color = Color::LIME
         } else if is_mouse_button_pressed(MouseButton::Right) {
-            ball_color = Color::DARKBLUE
+            ball_color = Color::DARK_BLUE
         } else if is_mouse_button_pressed(MouseButton::Side) {
             ball_color = Color::PURPLE
         } else if is_mouse_button_pressed(MouseButton::Extra) {
@@ -42,7 +42,7 @@ fn main() {
         }
 
         begin_drawing();
-        clear_background(Color::RAYWHITE);
+        clear_background(Color::RAY_WHITE);
 
         draw_circle_v(ball_position, 40f32, ball_color);
 
@@ -51,9 +51,9 @@ fn main() {
             10,
             10,
             20,
-            Color::DARKGRAY,
+            Color::DARK_GRAY,
         );
-        draw_text("Press 'H' to toggle cursor visibility", 10, 30, 20, Color::DARKGRAY);
+        draw_text("Press 'H' to toggle cursor visibility", 10, 30, 20, Color::DARK_GRAY);
 
         if is_cursor_hidden() {
             draw_text("CURSOR HIDDEN", 20, 60, 20, Color::RED);

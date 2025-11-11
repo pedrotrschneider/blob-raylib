@@ -30,9 +30,9 @@ fn main() {
         }
 
         begin_drawing();
-        clear_background(Color::RAYWHITE);
+        clear_background(Color::RAY_WHITE);
 
-        draw_text("move the ball with arrow keys", 10, 10, 20, Color::DARKGRAY);
+        draw_text("move the ball with arrow keys", 10, 10, 20, Color::DARK_GRAY);
         draw_circle_v(ball_position, 50f32, Color::MAROON);
 
         end_drawing();

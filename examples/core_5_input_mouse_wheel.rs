@@ -15,7 +15,7 @@ fn main() {
 
     while !window_should_close() {
         begin_drawing();
-        clear_background(Color::RAYWHITE);
+        clear_background(Color::RAY_WHITE);
 
         box_position_y -= get_mouse_wheel_move() as i32 * scroll_speed;
 
@@ -27,7 +27,7 @@ fn main() {
             10,
             40,
             20,
-            Color::LIGHTGRAY,
+            Color::LIGHT_GRAY,
         );
 
         end_drawing();

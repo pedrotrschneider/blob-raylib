@@ -35,7 +35,7 @@ fn main() {
 
     while !window_should_close() {
         begin_drawing();
-        clear_background(Color::RAYWHITE);
+        clear_background(Color::RAY_WHITE);
 
         if is_key_pressed(KeyboardKey::Left) {
             gamepad.prev();
@@ -83,7 +83,7 @@ fn main() {
             if gamepad.name().unwrap().to_lowercase().contains(XBOX_ALIAS_1)
                 || gamepad.name().unwrap().to_lowercase().contains(XBOX_ALIAS_2)
             {
-                draw_texture(tex_xbox_pad, 0, 0, Color::DARKGRAY);
+                draw_texture(tex_xbox_pad, 0, 0, Color::DARK_GRAY);
 
                 if gamepad.is_button_down(GamepadButton::Middle) {
                     draw_circle(394, 89, 19f32, Color::RED)
@@ -140,7 +140,7 @@ fn main() {
                 }
 
                 draw_circle(259, 152, 39.0, Color::BLACK);
-                draw_circle(259, 152, 34.0, Color::LIGHTGRAY);
+                draw_circle(259, 152, 34.0, Color::LIGHT_GRAY);
                 draw_circle(
                     (259.0 + left_stick_x * 20.0) as i32,
                     (152.0 + left_stick_y * 20.0) as i32,
@@ -155,7 +155,7 @@ fn main() {
                 }
 
                 draw_circle(461, 237, 38.0, Color::BLACK);
-                draw_circle(461, 237, 33.0, Color::LIGHTGRAY);
+                draw_circle(461, 237, 33.0, Color::LIGHT_GRAY);
                 draw_circle(
                     (461.0 + right_stick_x * 20.0) as i32,
                     (237.0 + right_stick_y * 20.0) as i32,
@@ -169,7 +169,7 @@ fn main() {
                 draw_rectangle(170, 30, 15, (((1.0 + left_trigger) / 2.0) * 70.0) as i32, Color::RED);
                 draw_rectangle(604, 30, 15, (((1.0 + right_trigger) / 2.0) * 70.0) as i32, Color::RED);
             } else if gamepad.name().unwrap().to_lowercase().contains(PS_ALIAS) {
-                draw_texture(tex_ps_pad, 0, 0, Color::DARKGRAY);
+                draw_texture(tex_ps_pad, 0, 0, Color::DARK_GRAY);
 
                 // Draw buttons: ps
                 if gamepad.is_button_down(GamepadButton::Middle) {
@@ -232,7 +232,7 @@ fn main() {
                 }
 
                 draw_circle(319, 255, 35.0, Color::BLACK);
-                draw_circle(319, 255, 31.0, Color::LIGHTGRAY);
+                draw_circle(319, 255, 31.0, Color::LIGHT_GRAY);
                 draw_circle(
                     (319.0 + left_stick_x * 20.0) as i32,
                     (255.0 + left_stick_y * 20.0) as i32,
@@ -247,7 +247,7 @@ fn main() {
                 }
 
                 draw_circle(475, 255, 35.0, Color::BLACK);
-                draw_circle(475, 255, 31.0, Color::LIGHTGRAY);
+                draw_circle(475, 255, 31.0, Color::LIGHT_GRAY);
                 draw_circle(
                     (475.0 + right_stick_x * 20.0) as i32,
                     (255.0 + right_stick_y * 20.0) as i32,
@@ -262,16 +262,16 @@ fn main() {
                 draw_rectangle(611, 48, 15, (((1.0 + right_trigger) / 2.0) * 70.0) as i32, Color::RED);
             } else {
                 // Draw background: generic
-                draw_rectangle_rounded((175f32, 110f32, 460f32, 220f32).into(), 0.3, 16, Color::DARKGRAY);
+                draw_rectangle_rounded((175f32, 110f32, 460f32, 220f32).into(), 0.3, 16, Color::DARK_GRAY);
 
                 // Draw buttons: basic
-                draw_circle(365, 170, 12.0, Color::RAYWHITE);
-                draw_circle(405, 170, 12.0, Color::RAYWHITE);
-                draw_circle(445, 170, 12.0, Color::RAYWHITE);
-                draw_circle(516, 191, 17.0, Color::RAYWHITE);
-                draw_circle(551, 227, 17.0, Color::RAYWHITE);
-                draw_circle(587, 191, 17.0, Color::RAYWHITE);
-                draw_circle(551, 155, 17.0, Color::RAYWHITE);
+                draw_circle(365, 170, 12.0, Color::RAY_WHITE);
+                draw_circle(405, 170, 12.0, Color::RAY_WHITE);
+                draw_circle(445, 170, 12.0, Color::RAY_WHITE);
+                draw_circle(516, 191, 17.0, Color::RAY_WHITE);
+                draw_circle(551, 227, 17.0, Color::RAY_WHITE);
+                draw_circle(587, 191, 17.0, Color::RAY_WHITE);
+                draw_circle(551, 155, 17.0, Color::RAY_WHITE);
 
                 if gamepad.is_button_down(GamepadButton::MiddleLeft) {
                     draw_circle(365, 170, 10.0, Color::RED);
@@ -296,8 +296,8 @@ fn main() {
                 }
 
                 // Draw buttons: d-pad
-                draw_rectangle(245, 145, 28, 88, Color::RAYWHITE);
-                draw_rectangle(215, 174, 88, 29, Color::RAYWHITE);
+                draw_rectangle(245, 145, 28, 88, Color::RAY_WHITE);
+                draw_rectangle(215, 174, 88, 29, Color::RAY_WHITE);
                 draw_rectangle(247, 147, 24, 84, Color::BLACK);
                 draw_rectangle(217, 176, 84, 25, Color::BLACK);
 
@@ -315,8 +315,8 @@ fn main() {
                 }
 
                 // Draw buttons: left-right back
-                draw_rectangle_rounded((215f32, 98f32, 100f32, 10f32).into(), 0.5, 16, Color::DARKGRAY);
-                draw_rectangle_rounded((495f32, 98f32, 100f32, 10f32).into(), 0.5, 16, Color::DARKGRAY);
+                draw_rectangle_rounded((215f32, 98f32, 100f32, 10f32).into(), 0.5, 16, Color::DARK_GRAY);
+                draw_rectangle_rounded((495f32, 98f32, 100f32, 10f32).into(), 0.5, 16, Color::DARK_GRAY);
 
                 if gamepad.is_button_down(GamepadButton::LeftTrigger1) {
                     draw_rectangle_rounded((215f32, 98f32, 100f32, 10f32).into(), 0.5, 16, Color::RED);
@@ -332,7 +332,7 @@ fn main() {
                 }
 
                 draw_circle(345, 260, 40.0, Color::BLACK);
-                draw_circle(345, 260, 35.0, Color::LIGHTGRAY);
+                draw_circle(345, 260, 35.0, Color::LIGHT_GRAY);
                 draw_circle(
                     (345.0 + left_stick_x * 20.0) as i32,
                     (260.0 + left_stick_y * 20.0) as i32,
@@ -347,7 +347,7 @@ fn main() {
                 }
 
                 draw_circle(465, 260, 40.0, Color::BLACK);
-                draw_circle(465, 260, 35.0, Color::LIGHTGRAY);
+                draw_circle(465, 260, 35.0, Color::LIGHT_GRAY);
                 draw_circle(
                     (465.0 + right_stick_x * 20.0) as i32,
                     (260.0 + right_stick_y * 20.0) as i32,
@@ -375,7 +375,7 @@ fn main() {
                     20,
                     70 + 20 * i,
                     10,
-                    Color::DARKGRAY,
+                    Color::DARK_GRAY,
                 );
             }
 
@@ -386,7 +386,7 @@ fn main() {
             }
         } else {
             draw_text(&format!("GP{}: NOT DETECTED", gamepad.id()), 10, 10, 10, Color::GRAY);
-            draw_texture(tex_xbox_pad, 0, 0, Color::LIGHTGRAY);
+            draw_texture(tex_xbox_pad, 0, 0, Color::LIGHT_GRAY);
         }
 
         end_drawing();

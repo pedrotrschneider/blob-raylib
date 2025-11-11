@@ -11,13 +11,13 @@ fn main() {
 
     while !window_should_close() {
         begin_drawing();
-        clear_background(Color::RAYWHITE);
+        clear_background(Color::RAY_WHITE);
         draw_text(
             "Congrats! You created your first window!",
             190,
             200,
             20,
-            Color::LIGHTGRAY,
+            Color::LIGHT_GRAY,
         );
         end_drawing();
     }

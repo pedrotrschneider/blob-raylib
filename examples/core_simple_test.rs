@@ -1,18 +1,23 @@
+use blob_raylib::{
+    Color, begin_drawing, clear_background, close_window, draw_text, end_drawing, init_window, set_target_fps,
+    window_should_close,
+};
+
 fn main() {
     let screen_width = 1920;
     let screen_height = 1080;
     let title = "this is a simple test window";
 
-    blob_raylib::init_window(screen_width, screen_height, title);
-    blob_raylib::set_target_fps(60);
+    init_window(screen_width, screen_height, title);
+    set_target_fps(60);
 
-    while !blob_raylib::window_should_close() {
-        blob_raylib::begin_drawing();
-        blob_raylib::clear_background(blob_raylib::RAYWHITE);
+    while !window_should_close() {
+        begin_drawing();
+        clear_background(Color::RAY_WHITE);
         let message = "Hello, Raylib! (No crates)";
-        blob_raylib::draw_text(message, 190, 200, 20, blob_raylib::DARKGRAY);
-        blob_raylib::end_drawing();
+        draw_text(message, 190, 200, 20, Color::DARK_GRAY);
+        end_drawing();
     }
 
-    blob_raylib::close_window();
+    close_window();
 }

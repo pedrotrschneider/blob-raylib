@@ -21,7 +21,7 @@ fn main() {
         }
 
         begin_drawing();
-        clear_background(Color::RAYWHITE);
+        clear_background(Color::RAY_WHITE);
 
         for i in 0..(t_count as usize) {
             if touch_positions[i].x <= 0f32 && touch_positions[i].y <= 0f32 {
@@ -42,7 +42,7 @@ fn main() {
             10,
             10,
             20,
-            Color::DARKGRAY,
+            Color::DARK_GRAY,
         );
 
         draw_text(
@@ -50,7 +50,7 @@ fn main() {
             10,
             40,
             20,
-            Color::DARKGRAY,
+            Color::DARK_GRAY,
         );
 
         end_drawing();

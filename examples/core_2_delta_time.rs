@@ -51,7 +51,7 @@ fn main() {
         }
 
         begin_drawing();
-        clear_background(Color::RAYWHITE);
+        clear_background(Color::RAY_WHITE);
 
         draw_circle_v(delta_circle, circle_radius, Color::RED);
         draw_circle_v(frame_circle, circle_radius, Color::BLUE);
@@ -63,20 +63,20 @@ fn main() {
             fps_text = format!("FPS: {} (target: {})", get_fps(), current_fps);
         }
 
-        draw_text(fps_text.as_str(), 10, 10, 20, Color::DARKGRAY);
+        draw_text(fps_text.as_str(), 10, 10, 20, Color::DARK_GRAY);
         draw_text(
             format!("Frame time: {:.3} ms", get_frame_time()).as_str(),
             10,
             30,
             20,
-            Color::DARKGRAY,
+            Color::DARK_GRAY,
         );
         draw_text(
             "Use the scroll wheel to change the fps limit, r to reset",
             10,
             50,
             20,
-            Color::DARKGRAY,
+            Color::DARK_GRAY,
         );
 
         draw_text("FUNC: x += GetFrameTime()*speed", 10, 90, 20, Color::RED);
